@@ -1,0 +1,23 @@
+{
+  "name": "devclass-backend",
+  "version": "1.0.0",
+  "description": "Diario de Evolucao Pedagogica com IA - Backend (DevClass)",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "@apollo/server": "^4.11.0",
+    "@as-integrations/express5": "^1.1.2",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.5",
+    "express": "^5.0.1",
+    "graphql": "^16.9.0",
+    "graphql-tag": "^2.12.6",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.7.0",
+    "openai": "^4.68.0"
+  }
+}
