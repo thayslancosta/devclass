@@ -276,7 +276,7 @@
           "response": []
         },
         {
-          "name": "Desativar um usuário",
+          "name": "Alterar status de um usuário",
           "request": {
             "auth": {
               "type": "bearer",
