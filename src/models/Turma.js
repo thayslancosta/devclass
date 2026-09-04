@@ -53,9 +53,14 @@ const turmaSchema = new mongoose.Schema(
       ],
     },
 
+    // Especificacao 7.2: obrigatorio, um ou mais objetos { diaSemana, horario }.
     encontros: {
       type: [encontroSchema],
       default: [],
+      validate: {
+        validator: (encontros) => Array.isArray(encontros) && encontros.length > 0,
+        message: 'A turma deve ter pelo menos um encontro.',
+      },
     },
 
     professorId: {

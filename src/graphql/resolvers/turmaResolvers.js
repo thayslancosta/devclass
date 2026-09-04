@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const { GraphQLError } = require('graphql');
+
 const Turma = require('../../models/Turma');
 
 const DIAS_SEMANA = [
@@ -11,9 +13,16 @@ const DIAS_SEMANA = [
   'domingo',
 ];
 
+const STATUS_TURMA = ['ativa', 'encerrada', 'todas'];
+
+// Codigos canonicos da especificacao (secao 11.8).
+function erro(mensagem, code) {
+  return new GraphQLError(mensagem, { extensions: { code } });
+}
+
 function exigirUsuario(context) {
   if (!context.usuario) {
-    throw new Error('Usuário não autenticado.');
+    throw erro('Usuário não autenticado.', 'UNAUTHENTICATED');
   }
 
   return context.usuario;
@@ -24,25 +33,34 @@ function validarPeriodoLetivo(periodoLetivo) {
     typeof periodoLetivo !== 'string' ||
     !/^\d{4}\.[12]$/.test(periodoLetivo)
   ) {
-    throw new Error(
-      'Período letivo inválido. Use o formato AAAA.1 ou AAAA.2.'
+    throw erro(
+      'Período letivo inválido. Use o formato AAAA.1 ou AAAA.2.',
+      'BAD_USER_INPUT'
     );
   }
 }
 
 function validarEncontros(encontros) {
-  if (!encontros) {
-    return [];
+  if (!Array.isArray(encontros)) {
+    throw erro(
+      'Encontros devem ser informados como uma lista.',
+      'BAD_USER_INPUT'
+    );
   }
 
-  if (!Array.isArray(encontros)) {
-    throw new Error('Encontros devem ser informados como uma lista.');
+  // Especificacao 7.2: a turma precisa de um ou mais encontros.
+  if (encontros.length === 0) {
+    throw erro(
+      'Informe pelo menos um encontro para a turma.',
+      'BAD_USER_INPUT'
+    );
   }
 
   for (const encontro of encontros) {
     if (!DIAS_SEMANA.includes(encontro.diaSemana)) {
-      throw new Error(
-        `Dia da semana inválido: ${encontro.diaSemana}.`
+      throw erro(
+        `Dia da semana inválido: ${encontro.diaSemana}. Use ${DIAS_SEMANA.join(', ')}.`,
+        'BAD_USER_INPUT'
       );
     }
 
@@ -50,8 +68,9 @@ function validarEncontros(encontros) {
       typeof encontro.horario !== 'string' ||
       !/^([01]\d|2[0-3]):([0-5]\d)$/.test(encontro.horario)
     ) {
-      throw new Error(
-        `Horário inválido: ${encontro.horario}. Use o formato HH:mm.`
+      throw erro(
+        `Horário inválido: ${encontro.horario}. Use o formato HH:mm.`,
+        'BAD_USER_INPUT'
       );
     }
   }
@@ -61,7 +80,7 @@ function validarEncontros(encontros) {
 
 function validarId(id) {
   if (!mongoose.Types.ObjectId.isValid(id)) {
-    throw new Error('ID da turma inválido.');
+    throw erro('ID da turma inválido.', 'BAD_USER_INPUT');
   }
 }
 
@@ -80,10 +99,23 @@ const turmaResolvers = {
     minhasTurmas: async (_parent, args, context) => {
   const usuario = exigirUsuario(context);
 
+  const status =
+    args.status === undefined || args.status === null ? 'ativa' : args.status;
+
+  if (!STATUS_TURMA.includes(status)) {
+    throw erro(
+      "Status de turma inválido. Use 'ativa', 'encerrada' ou 'todas'.",
+      'BAD_USER_INPUT'
+    );
+  }
+
   const filtro = {
     professorId: usuario.id,
-    status: args.status || 'ativa',
   };
+
+  if (status !== 'todas') {
+    filtro.status = status;
+  }
 
   if (
     args.periodoLetivo !== undefined &&
@@ -143,8 +175,9 @@ const turmaResolvers = {
   });
 
   if (!turma) {
-    throw new Error(
-      'Turma não encontrada ou não pertence ao usuário.'
+    throw erro(
+      'Turma não encontrada ou não pertence ao usuário.',
+      'NOT_FOUND'
     );
   }
 
@@ -168,14 +201,17 @@ const turmaResolvers = {
       });
 
       if (!turma) {
-        throw new Error(
-          'Turma não encontrada ou não pertence ao usuário.'
+        throw erro(
+          'Turma não encontrada ou não pertence ao usuário.',
+          'NOT_FOUND'
         );
       }
 
       turma.status = 'encerrada';
 
-      await turma.save();
+      // Só o status muda aqui: validar o documento inteiro quebraria turmas
+      // criadas antes da regra de "pelo menos um encontro".
+      await turma.save({ validateModifiedOnly: true });
 
       return turma;
     },
@@ -191,14 +227,16 @@ const turmaResolvers = {
       });
 
       if (!turma) {
-        throw new Error(
-          'Turma não encontrada ou não pertence ao usuário.'
+        throw erro(
+          'Turma não encontrada ou não pertence ao usuário.',
+          'NOT_FOUND'
         );
       }
 
       turma.status = 'ativa';
 
-      await turma.save();
+      // Mesmo motivo do encerrarTurma: valida apenas o campo alterado.
+      await turma.save({ validateModifiedOnly: true });
 
       return turma;
     },

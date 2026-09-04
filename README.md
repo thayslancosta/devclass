@@ -103,3 +103,164 @@ git checkout main
 git pull
 git checkout -b fase-2-turmas-joao
 ```
+
+---
+
+# Fase 2 — Turmas e períodos letivos
+
+**Responsável:** João Vitor Vicente
+**Arquivos:** `src/models/Turma.js`, `src/graphql/typeDefs/turmaTypeDefs.js`, `src/graphql/resolvers/turmaResolvers.js`
+
+## Operações
+
+| Tipo | Operação | Observação |
+| --- | --- | --- |
+| Query | `periodosDisponiveis` | períodos únicos do professor, do mais recente ao mais antigo |
+| Query | `minhasTurmas(periodoLetivo, status)` | sem `status`, retorna só as `ativa`. Aceita `ativa`, `encerrada` ou `todas` |
+| Query | `turma(id)` | só turma do professor autenticado |
+| Mutation | `criarTurma(input)` | `professorId` vem do JWT |
+| Mutation | `atualizarTurma(id, input)` | altera nome, estágio e encontros; não muda período nem proprietário |
+| Mutation | `encerrarTurma(id)` | `status = encerrada`, sem apagar |
+| Mutation | `reativarTurma(id)` | `status = ativa` |
+
+## Validações
+
+* `periodoLetivo`: `AAAA.1` ou `AAAA.2`.
+* `encontros`: **pelo menos um**, cada um com `diaSemana` e `horario`.
+* `diaSemana`: `segunda`, `terca`, `quarta`, `quinta`, `sexta`, `sabado`, `domingo` (minúsculas, seção 8 da especificação).
+* `horario`: `HH:mm` entre `00:00` e `23:59`.
+
+## Correções aplicadas na integração da Fase 3
+
+Ao integrar a Fase 3 foram encontrados e corrigidos quatro problemas na Fase 2:
+
+1. **A Fase 2 não estava integrada ao schema.** O `src/graphql/schema.js` continuava na versão da Fase 1, com apenas `type Query { health }`. Os arquivos de Turma existiam, mas nada os importava — nenhuma operação de turma existia em tempo de execução. Corrigido no `schema.js`.
+2. **`encontros` aceitava lista vazia**, contrariando a seção 7.2 ("obrigatório, um ou mais objetos"). Agora é exigido pelo menos um encontro, tanto no Model quanto no resolver.
+3. **`minhasTurmas(status)` não validava o valor recebido**: um status inválido devolvia lista vazia em silêncio. Agora devolve erro claro.
+4. **Erros não usavam `extensions.code`** da seção 11.8 — tudo virava `INTERNAL_SERVER_ERROR`. Agora usam `UNAUTHENTICATED`, `BAD_USER_INPUT` e `NOT_FOUND`, igual à Fase 3.
+
+`encerrarTurma` e `reativarTurma` salvam com `validateModifiedOnly: true`, porque só alteram `status`. Sem isso, turmas criadas antes da regra do item 2 não poderiam mais ser encerradas.
+
+---
+
+# Fase 3 — Alunos, responsáveis e matrículas
+
+**Responsável:** Ramon Trindade
+**Arquivos:** `src/models/Aluno.js`, `src/models/Matricula.js`, `src/graphql/typeDefs/alunoTypeDefs.js`, `src/graphql/typeDefs/matriculaTypeDefs.js`, `src/graphql/resolvers/alunoResolvers.js`, `src/graphql/resolvers/matriculaResolvers.js`
+
+## Models
+
+### Aluno
+
+| Campo | Tipo | Obrigatório | Regra |
+| --- | --- | --- | --- |
+| `nome` | String | sim | trim; não pode ser vazio |
+| `generoGramatical` | Enum | sim | `masculino` \| `feminino` \| `neutro` |
+| `nomeResponsavel` | String | não | trim |
+| `generoResponsavel` | Enum | condicional | `masculino` \| `feminino` \| `neutro` |
+| `contatoResponsavel` | String | não | dado humano; **nunca enviado à IA** |
+| `professorId` | ObjectId | sim | referência a `Usuario`; sempre do JWT |
+| `status` | Enum | sim | `ativo` \| `inativo`; padrão `ativo` |
+
+### Matricula
+
+| Campo | Tipo | Obrigatório | Regra |
+| --- | --- | --- | --- |
+| `alunoId` | ObjectId | sim | `Aluno` do mesmo professor |
+| `turmaId` | ObjectId | sim | `Turma` do mesmo professor |
+| `periodoLetivo` | String | sim | **copiado da turma** |
+| `status` | Enum | sim | `ativa` \| `encerrada`; padrão `ativa` |
+
+Índice único composto: `matriculaSchema.index({ alunoId: 1, periodoLetivo: 1 }, { unique: true })`.
+
+Ambos usam `timestamps: true`.
+
+## Operações
+
+| Tipo | Operação |
+| --- | --- |
+| Query | `aluno(id)` — inclui `matriculas` quando solicitado |
+| Query | `alunosDaTurma(turmaId, status)` — padrão `ativa`; aceita `ativa`, `encerrada`, `todas` |
+| Mutation | `criarAluno(input)` |
+| Mutation | `atualizarAluno(id, input)` |
+| Mutation | `inativarAluno(id)` / `reativarAluno(id)` |
+| Mutation | `matricularAluno(alunoId, turmaId)` |
+| Mutation | `encerrarMatricula(id)` |
+
+Nenhum input aceita `professorId`, `status` ou `periodoLetivo`.
+
+## Exemplos
+
+```graphql
+mutation {
+  criarAluno(input: { nome: "Ana Souza", generoGramatical: "feminino" }) {
+    id
+    status
+  }
+}
+```
+
+```graphql
+mutation {
+  matricularAluno(alunoId: "ID_DO_ALUNO", turmaId: "ID_DA_TURMA") {
+    id
+    periodoLetivo
+    status
+  }
+}
+```
+
+```graphql
+query {
+  aluno(id: "ID_DO_ALUNO") {
+    nome
+    status
+    matriculas {
+      id
+      periodoLetivo
+      status
+      turma { nome }
+    }
+  }
+}
+```
+
+## Regra do responsável
+
+O aluno pode existir sem responsável. Se `generoResponsavel` ou `contatoResponsavel` forem informados, `nomeResponsavel` passa a ser obrigatório. A regra é validada no resolver e novamente no `pre('validate')` do Model. Em `atualizarAluno`, a validação roda sobre o **estado final** do documento — não dá para deixar o aluno incoerente limpando só o nome.
+
+## Regras de matrícula e rematrícula
+
+* O `periodoLetivo` é sempre copiado da turma.
+* Um aluno só pode ter **uma matrícula por período letivo**. Conflito devolve erro claro com código `CONFLICT`, sem expor o `E11000` do MongoDB.
+* **Rematrícula:** o mesmo aluno pode ser matriculado em turma de outro semestre; o histórico é preservado.
+* Não é possível matricular aluno `inativo` nem em turma `encerrada`.
+* Encerrar matrícula muda o `status` e **não** apaga o documento. Como o índice único considera `alunoId + periodoLetivo` independente do status, encerrar não libera o aluno para outra turma no mesmo semestre — é intencional.
+
+## Segurança
+
+* Todas as operações exigem `context.usuario`.
+* `professorId` vem exclusivamente de `context.usuario.id`.
+* Recurso de outro professor devolve sempre a mesma mensagem com código `NOT_FOUND`, para não revelar a existência de documento alheio (regra 13.3 §137).
+* Nenhuma exclusão física: sem `delete`, `findByIdAndDelete`, `deleteOne` ou `deleteMany`.
+
+## Códigos de erro (seção 11.8)
+
+| Código | Quando |
+| --- | --- |
+| `UNAUTHENTICATED` | sem token válido |
+| `BAD_USER_INPUT` | enum, ID ou responsável incoerente |
+| `NOT_FOUND` | recurso inexistente ou de outro professor |
+| `CONFLICT` | matrícula duplicada no mesmo período |
+
+## Testes
+
+A collection tem a pasta `04 - Alunos e matrículas` com 20 requisições na ordem de execução, com testes automáticos que gravam `alunoId`, `alunoId2`, `matriculaId` e `matriculaId2` nas variáveis.
+
+Preencha antes: `baseUrl`, `professorToken`, `professorTokenB`, `turmaId`, `turmaIdMesmoPeriodo` (outra turma do **mesmo** período), `turmaIdOutroSemestre` e `turmaIdProfessorB`.
+
+## Pendências registradas
+
+* **Índice único sem filtro de status.** Se o grupo quiser permitir troca de turma dentro do mesmo semestre, será preciso um índice parcial (`partialFilterExpression: { status: 'ativa' }`) — é mudança de regra e exige atualizar a especificação antes.
+* **`alunosDaTurma` filtra por status da matrícula, não do aluno.** Um aluno `inativo` com matrícula `ativa` ainda aparece. A regra 17.1 §160 sugere ocultar inativos na visão padrão; o plano pede "liste alunos por matrícula ativa da turma". Pendente de decisão do grupo.
+* **`atualizarTurma` (Fase 2) exige `periodoLetivo` no input mas ignora o valor.** Corrigir exigiria um `AtualizarTurmaInput` separado, mudando o contrato que o Postman da Fase 2 já usa. Não alterado.
