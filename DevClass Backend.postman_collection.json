@@ -344,6 +344,283 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "03 - Turmas",
+      "item": [
+        {
+          "name": "Listar per�odos dispon�veis",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{professorToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query { periodosDisponiveis }",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "graphql"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar minhas turmas",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{professorToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query { minhasTurmas { id nome estagio periodoLetivo status encontros { diaSemana horario } createdAt updatedAt } }",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "graphql"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar minhas turmas por per�odo e status",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{professorToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query($periodoLetivo: String, $status: String) { minhasTurmas(periodoLetivo: $periodoLetivo, status: $status) { id nome estagio periodoLetivo status encontros { diaSemana horario } } }",
+                "variables": "{\n  \"periodoLetivo\": \"2026.2\",\n  \"status\": \"ativa\"\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "graphql"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar turma por ID",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{professorToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query($id: ID!) { turma(id: $id) { id nome estagio periodoLetivo status encontros { diaSemana horario } createdAt updatedAt } }",
+                "variables": "{\n  \"id\": \"COLOQUE_O_ID_DA_TURMA_AQUI\"\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "graphql"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Criar turma",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{professorToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation($input: TurmaInput!) { criarTurma(input: $input) { id nome estagio periodoLetivo status encontros { diaSemana horario } createdAt updatedAt } }",
+                "variables": "{\n  \"input\": {\n    \"nome\": \"Turma Teste Fase 2\",\n    \"estagio\": \"Est�gio 1\",\n    \"periodoLetivo\": \"2026.2\",\n    \"encontros\": [\n      {\n        \"diaSemana\": \"segunda\",\n        \"horario\": \"19:00\"\n      },\n      {\n        \"diaSemana\": \"quarta\",\n        \"horario\": \"19:00\"\n      }\n    ]\n  }\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "graphql"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar turma",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{professorToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation($id: ID!, $input: TurmaInput!) { atualizarTurma(id: $id, input: $input) { id nome estagio periodoLetivo status encontros { diaSemana horario } updatedAt } }",
+                "variables": "{\n  \"id\": \"COLOQUE_O_ID_DA_TURMA_AQUI\",\n  \"input\": {\n    \"nome\": \"Turma Atualizada\",\n    \"estagio\": \"Est�gio 2\",\n    \"periodoLetivo\": \"2026.2\",\n    \"encontros\": [\n      {\n        \"diaSemana\": \"terca\",\n        \"horario\": \"20:00\"\n      }\n    ]\n  }\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "graphql"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Encerrar turma",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{professorToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation($id: ID!) { encerrarTurma(id: $id) { id nome status } }",
+                "variables": "{\n  \"id\": \"COLOQUE_O_ID_DA_TURMA_AQUI\"\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "graphql"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reativar turma",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{professorToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation($id: ID!) { reativarTurma(id: $id) { id nome status } }",
+                "variables": "{\n  \"id\": \"COLOQUE_O_ID_DA_TURMA_AQUI\"\n}"
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/graphql",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "graphql"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ]
 }
