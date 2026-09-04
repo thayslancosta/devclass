@@ -28,7 +28,11 @@ async function iniciar() {
   app.use('/admin', adminRoutes);
 
   // Apollo / GraphQL
-  const apollo = new ApolloServer({ typeDefs, resolvers });
+  const apollo = new ApolloServer({
+  typeDefs,
+  resolvers,
+  includeStacktraceInErrorResponses: false,
+});
   await apollo.start();
   app.use('/graphql', expressMiddleware(apollo, { context: contexto }));
 
