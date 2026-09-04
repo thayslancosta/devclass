@@ -11,3 +11,4 @@ localResources:
 cloudResources:
   collections:
     ../postman/collections/DevClass Backend: f6e5d98e-92b2-4fb4-999f-7e4ee0823c12
+    ../postman/collections/DevClass Backend-1: b91c8d7d-320c-49a5-b9cc-05ef1204540f
