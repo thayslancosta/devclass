@@ -1,626 +1,1570 @@
 {
-  "info": {
-    "_postman_id": "0f0533b8-e37b-4f2e-b2c2-0509acf8cf98",
-    "name": "DevClass Backend",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "48375717",
-    "_collection_link": "https://go.postman.co/collection/48375717-0f0533b8-e37b-4f2e-b2c2-0509acf8cf98?source=collection_link"
-  },
-  "item": [
+ "info": {
+  "_postman_id": "0f0533b8-e37b-4f2e-b2c2-0509acf8cf98",
+  "name": "DevClass Backend",
+  "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+  "_exporter_id": "48375717",
+  "_collection_link": "https://go.postman.co/collection/48375717-0f0533b8-e37b-4f2e-b2c2-0509acf8cf98?source=collection_link"
+ },
+ "item": [
+  {
+   "name": "01 - Auth",
+   "item": [
     {
-      "name": "01 - Auth",
-      "item": [
-        {
-          "name": "Cadastrar professor",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n  \"nome\": \"Professor Teste\",\r\n  \"email\": \"professorteste@email.com\",\r\n  \"senha\": \"123456\"\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:3000/auth/register",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "3000",
-              "path": [
-                "auth",
-                "register"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Cadastro de email duplicado",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n  \"nome\": \"Maria Silva\",\r\n  \"email\": \"maria@email.com\",\r\n  \"senha\": \"123456\"\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:3000/auth/register",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "3000",
-              "path": [
-                "auth",
-                "register"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Login",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n  \"email\": \"professorteste@email.com\",\r\n  \"senha\": \"123456\"\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:3000/auth/login",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "3000",
-              "path": [
-                "auth",
-                "login"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Senha errada",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n  \"email\": \"maria@email.com\",\r\n  \"senha\": \"senhaerrada\"\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:3000/auth/login",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "3000",
-              "path": [
-                "auth",
-                "login"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Requisição do GraphQL",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{professorToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "graphql",
-              "graphql": {
-                "query": "{\r\n  health\r\n}",
-                "variables": ""
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/graphql",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "graphql"
-              ]
-            }
-          },
-          "response": []
+     "name": "Cadastrar professor",
+     "request": {
+      "method": "POST",
+      "header": [],
+      "body": {
+       "mode": "raw",
+       "raw": "{\r\n  \"nome\": \"Professor Teste\",\r\n  \"email\": \"professorteste@email.com\",\r\n  \"senha\": \"123456\"\r\n}",
+       "options": {
+        "raw": {
+         "language": "json"
         }
-      ]
+       }
+      },
+      "url": {
+       "raw": "http://localhost:3000/auth/register",
+       "protocol": "http",
+       "host": [
+        "localhost"
+       ],
+       "port": "3000",
+       "path": [
+        "auth",
+        "register"
+       ]
+      }
+     },
+     "response": []
     },
     {
-      "name": "02 - Admin",
-      "item": [
-        {
-          "name": "Rota admin sem token",
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          },
-          "request": {
-            "method": "GET",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/admin/usuarios",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "usuarios"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Rota admin com professor",
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          },
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{professorToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/admin/usuarios",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "usuarios"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Admin acessando",
-          "protocolProfileBehavior": {
-            "disableBodyPruning": true
-          },
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{adminToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/admin/usuarios",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "usuarios"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Alterar status de um usuário",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{adminToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "PATCH",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n  \"ativo\": true\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/admin/usuarios/6a987be8092d40284b326a53/status",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "admin",
-                "usuarios",
-                "6a987be8092d40284b326a53",
-                "status"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Login como admin",
-          "request": {
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n  \"email\": \"maria@email.com\",\r\n  \"senha\": \"123456\"\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "http://localhost:3000/auth/login",
-              "protocol": "http",
-              "host": [
-                "localhost"
-              ],
-              "port": "3000",
-              "path": [
-                "auth",
-                "login"
-              ]
-            }
-          },
-          "response": []
+     "name": "Cadastro de email duplicado",
+     "request": {
+      "method": "POST",
+      "header": [],
+      "body": {
+       "mode": "raw",
+       "raw": "{\r\n  \"nome\": \"Maria Silva\",\r\n  \"email\": \"maria@email.com\",\r\n  \"senha\": \"123456\"\r\n}",
+       "options": {
+        "raw": {
+         "language": "json"
         }
-      ]
+       }
+      },
+      "url": {
+       "raw": "http://localhost:3000/auth/register",
+       "protocol": "http",
+       "host": [
+        "localhost"
+       ],
+       "port": "3000",
+       "path": [
+        "auth",
+        "register"
+       ]
+      }
+     },
+     "response": []
     },
     {
-      "name": "03 - Turmas",
-      "item": [
-        {
-          "name": "Listar per�odos dispon�veis",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{professorToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "graphql",
-              "graphql": {
-                "query": "query { periodosDisponiveis }",
-                "variables": ""
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/graphql",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "graphql"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Listar minhas turmas",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{professorToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "graphql",
-              "graphql": {
-                "query": "query { minhasTurmas { id nome estagio periodoLetivo status encontros { diaSemana horario } createdAt updatedAt } }",
-                "variables": ""
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/graphql",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "graphql"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Listar minhas turmas por per�odo e status",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{professorToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "graphql",
-              "graphql": {
-                "query": "query($periodoLetivo: String, $status: String) { minhasTurmas(periodoLetivo: $periodoLetivo, status: $status) { id nome estagio periodoLetivo status encontros { diaSemana horario } } }",
-                "variables": "{\n  \"periodoLetivo\": \"2026.2\",\n  \"status\": \"ativa\"\n}"
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/graphql",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "graphql"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Buscar turma por ID",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{professorToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "graphql",
-              "graphql": {
-                "query": "query($id: ID!) { turma(id: $id) { id nome estagio periodoLetivo status encontros { diaSemana horario } createdAt updatedAt } }",
-                "variables": "{\n  \"id\": \"COLOQUE_O_ID_DA_TURMA_AQUI\"\n}"
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/graphql",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "graphql"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Criar turma",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{professorToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "graphql",
-              "graphql": {
-                "query": "mutation($input: TurmaInput!) { criarTurma(input: $input) { id nome estagio periodoLetivo status encontros { diaSemana horario } createdAt updatedAt } }",
-                "variables": "{\n  \"input\": {\n    \"nome\": \"Turma Teste Fase 2\",\n    \"estagio\": \"Est�gio 1\",\n    \"periodoLetivo\": \"2026.2\",\n    \"encontros\": [\n      {\n        \"diaSemana\": \"segunda\",\n        \"horario\": \"19:00\"\n      },\n      {\n        \"diaSemana\": \"quarta\",\n        \"horario\": \"19:00\"\n      }\n    ]\n  }\n}"
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/graphql",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "graphql"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Atualizar turma",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{professorToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "graphql",
-              "graphql": {
-                "query": "mutation($id: ID!, $input: TurmaInput!) { atualizarTurma(id: $id, input: $input) { id nome estagio periodoLetivo status encontros { diaSemana horario } updatedAt } }",
-                "variables": "{\n  \"id\": \"COLOQUE_O_ID_DA_TURMA_AQUI\",\n  \"input\": {\n    \"nome\": \"Turma Atualizada\",\n    \"estagio\": \"Est�gio 2\",\n    \"periodoLetivo\": \"2026.2\",\n    \"encontros\": [\n      {\n        \"diaSemana\": \"terca\",\n        \"horario\": \"20:00\"\n      }\n    ]\n  }\n}"
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/graphql",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "graphql"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Encerrar turma",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{professorToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "graphql",
-              "graphql": {
-                "query": "mutation($id: ID!) { encerrarTurma(id: $id) { id nome status } }",
-                "variables": "{\n  \"id\": \"COLOQUE_O_ID_DA_TURMA_AQUI\"\n}"
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/graphql",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "graphql"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Reativar turma",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{professorToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "graphql",
-              "graphql": {
-                "query": "mutation($id: ID!) { reativarTurma(id: $id) { id nome status } }",
-                "variables": "{\n  \"id\": \"COLOQUE_O_ID_DA_TURMA_AQUI\"\n}"
-              }
-            },
-            "url": {
-              "raw": "{{baseUrl}}/graphql",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "graphql"
-              ]
-            }
-          },
-          "response": []
+     "name": "Login",
+     "request": {
+      "method": "POST",
+      "header": [],
+      "body": {
+       "mode": "raw",
+       "raw": "{\r\n  \"email\": \"professorteste@email.com\",\r\n  \"senha\": \"123456\"\r\n}",
+       "options": {
+        "raw": {
+         "language": "json"
         }
-      ]
+       }
+      },
+      "url": {
+       "raw": "http://localhost:3000/auth/login",
+       "protocol": "http",
+       "host": [
+        "localhost"
+       ],
+       "port": "3000",
+       "path": [
+        "auth",
+        "login"
+       ]
+      }
+     },
+     "response": []
+    },
+    {
+     "name": "Senha errada",
+     "request": {
+      "method": "POST",
+      "header": [],
+      "body": {
+       "mode": "raw",
+       "raw": "{\r\n  \"email\": \"maria@email.com\",\r\n  \"senha\": \"senhaerrada\"\r\n}",
+       "options": {
+        "raw": {
+         "language": "json"
+        }
+       }
+      },
+      "url": {
+       "raw": "http://localhost:3000/auth/login",
+       "protocol": "http",
+       "host": [
+        "localhost"
+       ],
+       "port": "3000",
+       "path": [
+        "auth",
+        "login"
+       ]
+      }
+     },
+     "response": []
+    },
+    {
+     "name": "Requisição do GraphQL",
+     "request": {
+      "auth": {
+       "type": "bearer",
+       "bearer": [
+        {
+         "key": "token",
+         "value": "{{professorToken}}",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "POST",
+      "header": [],
+      "body": {
+       "mode": "graphql",
+       "graphql": {
+        "query": "{\r\n  health\r\n}",
+        "variables": ""
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/graphql",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "graphql"
+       ]
+      }
+     },
+     "response": []
     }
-  ]
+   ]
+  },
+  {
+   "name": "02 - Admin",
+   "item": [
+    {
+     "name": "Rota admin sem token",
+     "protocolProfileBehavior": {
+      "disableBodyPruning": true
+     },
+     "request": {
+      "method": "GET",
+      "header": [],
+      "body": {
+       "mode": "raw",
+       "raw": "",
+       "options": {
+        "raw": {
+         "language": "json"
+        }
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/admin/usuarios",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "admin",
+        "usuarios"
+       ]
+      }
+     },
+     "response": []
+    },
+    {
+     "name": "Rota admin com professor",
+     "protocolProfileBehavior": {
+      "disableBodyPruning": true
+     },
+     "request": {
+      "auth": {
+       "type": "bearer",
+       "bearer": [
+        {
+         "key": "token",
+         "value": "{{professorToken}}",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "GET",
+      "header": [],
+      "body": {
+       "mode": "raw",
+       "raw": "",
+       "options": {
+        "raw": {
+         "language": "json"
+        }
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/admin/usuarios",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "admin",
+        "usuarios"
+       ]
+      }
+     },
+     "response": []
+    },
+    {
+     "name": "Admin acessando",
+     "protocolProfileBehavior": {
+      "disableBodyPruning": true
+     },
+     "request": {
+      "auth": {
+       "type": "bearer",
+       "bearer": [
+        {
+         "key": "token",
+         "value": "{{adminToken}}",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "GET",
+      "header": [],
+      "body": {
+       "mode": "raw",
+       "raw": "",
+       "options": {
+        "raw": {
+         "language": "json"
+        }
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/admin/usuarios",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "admin",
+        "usuarios"
+       ]
+      }
+     },
+     "response": []
+    },
+    {
+     "name": "Alterar status de um usuário",
+     "request": {
+      "auth": {
+       "type": "bearer",
+       "bearer": [
+        {
+         "key": "token",
+         "value": "{{adminToken}}",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "PATCH",
+      "header": [],
+      "body": {
+       "mode": "raw",
+       "raw": "{\r\n  \"ativo\": true\r\n}",
+       "options": {
+        "raw": {
+         "language": "json"
+        }
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/admin/usuarios/6a987be8092d40284b326a53/status",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "admin",
+        "usuarios",
+        "6a987be8092d40284b326a53",
+        "status"
+       ]
+      }
+     },
+     "response": []
+    },
+    {
+     "name": "Login como admin",
+     "request": {
+      "method": "POST",
+      "header": [],
+      "body": {
+       "mode": "raw",
+       "raw": "{\r\n  \"email\": \"maria@email.com\",\r\n  \"senha\": \"123456\"\r\n}",
+       "options": {
+        "raw": {
+         "language": "json"
+        }
+       }
+      },
+      "url": {
+       "raw": "http://localhost:3000/auth/login",
+       "protocol": "http",
+       "host": [
+        "localhost"
+       ],
+       "port": "3000",
+       "path": [
+        "auth",
+        "login"
+       ]
+      }
+     },
+     "response": []
+    }
+   ]
+  },
+  {
+   "name": "03 - Turmas",
+   "item": [
+    {
+     "name": "Listar períodos disponíveis",
+     "request": {
+      "auth": {
+       "type": "bearer",
+       "bearer": [
+        {
+         "key": "token",
+         "value": "{{professorToken}}",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "POST",
+      "header": [],
+      "body": {
+       "mode": "graphql",
+       "graphql": {
+        "query": "query { periodosDisponiveis }",
+        "variables": ""
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/graphql",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "graphql"
+       ]
+      }
+     },
+     "response": []
+    },
+    {
+     "name": "Listar minhas turmas",
+     "request": {
+      "auth": {
+       "type": "bearer",
+       "bearer": [
+        {
+         "key": "token",
+         "value": "{{professorToken}}",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "POST",
+      "header": [],
+      "body": {
+       "mode": "graphql",
+       "graphql": {
+        "query": "query { minhasTurmas { id nome estagio periodoLetivo status encontros { diaSemana horario } createdAt updatedAt } }",
+        "variables": ""
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/graphql",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "graphql"
+       ]
+      }
+     },
+     "response": []
+    },
+    {
+     "name": "Listar minhas turmas por período e status",
+     "request": {
+      "auth": {
+       "type": "bearer",
+       "bearer": [
+        {
+         "key": "token",
+         "value": "{{professorToken}}",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "POST",
+      "header": [],
+      "body": {
+       "mode": "graphql",
+       "graphql": {
+        "query": "query($periodoLetivo: String, $status: String) { minhasTurmas(periodoLetivo: $periodoLetivo, status: $status) { id nome estagio periodoLetivo status encontros { diaSemana horario } } }",
+        "variables": "{\n  \"periodoLetivo\": \"2026.2\",\n  \"status\": \"ativa\"\n}"
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/graphql",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "graphql"
+       ]
+      }
+     },
+     "response": []
+    },
+    {
+     "name": "Buscar turma por ID",
+     "request": {
+      "auth": {
+       "type": "bearer",
+       "bearer": [
+        {
+         "key": "token",
+         "value": "{{professorToken}}",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "POST",
+      "header": [],
+      "body": {
+       "mode": "graphql",
+       "graphql": {
+        "query": "query($id: ID!) { turma(id: $id) { id nome estagio periodoLetivo status encontros { diaSemana horario } createdAt updatedAt } }",
+        "variables": "{\n  \"id\": \"COLOQUE_O_ID_DA_TURMA_AQUI\"\n}"
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/graphql",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "graphql"
+       ]
+      }
+     },
+     "response": []
+    },
+    {
+     "name": "Criar turma",
+     "request": {
+      "auth": {
+       "type": "bearer",
+       "bearer": [
+        {
+         "key": "token",
+         "value": "{{professorToken}}",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "POST",
+      "header": [],
+      "body": {
+       "mode": "graphql",
+       "graphql": {
+        "query": "mutation($input: TurmaInput!) { criarTurma(input: $input) { id nome estagio periodoLetivo status encontros { diaSemana horario } createdAt updatedAt } }",
+        "variables": "{\n  \"input\": {\n    \"nome\": \"Turma Teste Fase 2\",\n    \"estagio\": \"Estágio 1\",\n    \"periodoLetivo\": \"2026.2\",\n    \"encontros\": [\n      {\n        \"diaSemana\": \"segunda\",\n        \"horario\": \"19:00\"\n      },\n      {\n        \"diaSemana\": \"quarta\",\n        \"horario\": \"19:00\"\n      }\n    ]\n  }\n}"
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/graphql",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "graphql"
+       ]
+      }
+     },
+     "response": []
+    },
+    {
+     "name": "Atualizar turma",
+     "request": {
+      "auth": {
+       "type": "bearer",
+       "bearer": [
+        {
+         "key": "token",
+         "value": "{{professorToken}}",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "POST",
+      "header": [],
+      "body": {
+       "mode": "graphql",
+       "graphql": {
+        "query": "mutation($id: ID!, $input: TurmaInput!) { atualizarTurma(id: $id, input: $input) { id nome estagio periodoLetivo status encontros { diaSemana horario } updatedAt } }",
+        "variables": "{\n  \"id\": \"COLOQUE_O_ID_DA_TURMA_AQUI\",\n  \"input\": {\n    \"nome\": \"Turma Atualizada\",\n    \"estagio\": \"Estágio 2\",\n    \"periodoLetivo\": \"2026.2\",\n    \"encontros\": [\n      {\n        \"diaSemana\": \"terca\",\n        \"horario\": \"20:00\"\n      }\n    ]\n  }\n}"
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/graphql",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "graphql"
+       ]
+      }
+     },
+     "response": []
+    },
+    {
+     "name": "Encerrar turma",
+     "request": {
+      "auth": {
+       "type": "bearer",
+       "bearer": [
+        {
+         "key": "token",
+         "value": "{{professorToken}}",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "POST",
+      "header": [],
+      "body": {
+       "mode": "graphql",
+       "graphql": {
+        "query": "mutation($id: ID!) { encerrarTurma(id: $id) { id nome status } }",
+        "variables": "{\n  \"id\": \"COLOQUE_O_ID_DA_TURMA_AQUI\"\n}"
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/graphql",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "graphql"
+       ]
+      }
+     },
+     "response": []
+    },
+    {
+     "name": "Reativar turma",
+     "request": {
+      "auth": {
+       "type": "bearer",
+       "bearer": [
+        {
+         "key": "token",
+         "value": "{{professorToken}}",
+         "type": "string"
+        }
+       ]
+      },
+      "method": "POST",
+      "header": [],
+      "body": {
+       "mode": "graphql",
+       "graphql": {
+        "query": "mutation($id: ID!) { reativarTurma(id: $id) { id nome status } }",
+        "variables": "{\n  \"id\": \"COLOQUE_O_ID_DA_TURMA_AQUI\"\n}"
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/graphql",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "graphql"
+       ]
+      }
+     },
+     "response": []
+    }
+   ]
+  },
+  {
+   "name": "04 - Alunos e matrículas",
+   "description": "Fase 3 — Ramon Trindade. Rode na ordem. Preencha antes: baseUrl, professorToken, professorTokenB, turmaId, turmaIdMesmoPeriodo, turmaIdOutroSemestre e turmaIdProfessorB.",
+   "item": [
+    {
+     "name": "01 - Criar aluno sem responsável",
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{professorToken}}",
+        "type": "text"
+       }
+      ],
+      "body": {
+       "mode": "graphql",
+       "graphql": {
+        "query": "mutation CriarAluno($input: CriarAlunoInput!) {\n  criarAluno(input: $input) {\n    id\n    nome\n    generoGramatical\n    status\n    nomeResponsavel\n    generoResponsavel\n    contatoResponsavel\n  }\n}\n",
+        "variables": "{\n  \"input\": {\n    \"nome\": \"Ana Souza\",\n    \"generoGramatical\": \"feminino\"\n  }\n}"
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/graphql",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "graphql"
+       ]
+      },
+      "description": "O aluno pode existir sem nenhum dado de responsável."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const r = pm.response.json();",
+         "pm.test('sem erros', () => pm.expect(r.errors, JSON.stringify(r.errors)).to.be.undefined);",
+         "pm.collectionVariables.set('alunoId', r.data.criarAluno.id);",
+         "pm.test('status ativo', () => pm.expect(r.data.criarAluno.status).to.eql('ativo'));",
+         "pm.test('sem responsavel', () => pm.expect(r.data.criarAluno.nomeResponsavel).to.be.null);"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "02 - Criar aluno com responsável",
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{professorToken}}",
+        "type": "text"
+       }
+      ],
+      "body": {
+       "mode": "graphql",
+       "graphql": {
+        "query": "mutation CriarAluno($input: CriarAlunoInput!) {\n  criarAluno(input: $input) {\n    id\n    nome\n    generoGramatical\n    status\n    nomeResponsavel\n    generoResponsavel\n    contatoResponsavel\n  }\n}\n",
+        "variables": "{\n  \"input\": {\n    \"nome\": \"Bruno Lima\",\n    \"generoGramatical\": \"masculino\",\n    \"nomeResponsavel\": \"Carla Lima\",\n    \"generoResponsavel\": \"feminino\",\n    \"contatoResponsavel\": \"(85) 99999-0000\"\n  }\n}"
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/graphql",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "graphql"
+       ]
+      },
+      "description": "O contato do responsável é dado humano e nunca é enviado à IA."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const r = pm.response.json();",
+         "pm.test('sem erros', () => pm.expect(r.errors, JSON.stringify(r.errors)).to.be.undefined);",
+         "pm.collectionVariables.set('alunoId2', r.data.criarAluno.id);"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "03 - Erro: contato sem nome do responsável",
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{professorToken}}",
+        "type": "text"
+       }
+      ],
+      "body": {
+       "mode": "graphql",
+       "graphql": {
+        "query": "mutation CriarAluno($input: CriarAlunoInput!) {\n  criarAluno(input: $input) {\n    id\n    nome\n    generoGramatical\n    status\n    nomeResponsavel\n    generoResponsavel\n    contatoResponsavel\n  }\n}\n",
+        "variables": "{\n  \"input\": {\n    \"nome\": \"Caio Rocha\",\n    \"generoGramatical\": \"masculino\",\n    \"contatoResponsavel\": \"(85) 98888-0000\"\n  }\n}"
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/graphql",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "graphql"
+       ]
+      }
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const r = pm.response.json();",
+         "pm.test('devolve erro', () => pm.expect(r.errors).to.be.an('array'));",
+         "pm.test('mensagem clara em portugues', () => pm.expect(r.errors[0].message).to.include('Informe o nome do responsável'));",
+         "pm.test('nao vaza erro bruto do MongoDB', () => pm.expect(r.errors[0].message).to.not.match(/E11000|duplicate key|stack/i));",
+         "pm.test('codigo BAD_USER_INPUT', () => pm.expect(r.errors[0].extensions.code).to.eql('BAD_USER_INPUT'));"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "04 - Erro: gênero gramatical inválido",
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{professorToken}}",
+        "type": "text"
+       }
+      ],
+      "body": {
+       "mode": "graphql",
+       "graphql": {
+        "query": "mutation CriarAluno($input: CriarAlunoInput!) {\n  criarAluno(input: $input) {\n    id\n    nome\n    generoGramatical\n    status\n    nomeResponsavel\n    generoResponsavel\n    contatoResponsavel\n  }\n}\n",
+        "variables": "{\n  \"input\": {\n    \"nome\": \"Caio Rocha\",\n    \"generoGramatical\": \"outro\"\n  }\n}"
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/graphql",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "graphql"
+       ]
+      }
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const r = pm.response.json();",
+         "pm.test('devolve erro', () => pm.expect(r.errors).to.be.an('array'));",
+         "pm.test('mensagem clara em portugues', () => pm.expect(r.errors[0].message).to.include('Gênero gramatical inválido'));",
+         "pm.test('nao vaza erro bruto do MongoDB', () => pm.expect(r.errors[0].message).to.not.match(/E11000|duplicate key|stack/i));",
+         "pm.test('codigo BAD_USER_INPUT', () => pm.expect(r.errors[0].extensions.code).to.eql('BAD_USER_INPUT'));"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "05 - Erro: limpar nome mantendo contato",
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{professorToken}}",
+        "type": "text"
+       }
+      ],
+      "body": {
+       "mode": "graphql",
+       "graphql": {
+        "query": "mutation AtualizarAluno($id: ID!, $input: AtualizarAlunoInput!) {\n  atualizarAluno(id: $id, input: $input) {\n    id\n    nome\n    nomeResponsavel\n    contatoResponsavel\n  }\n}\n",
+        "variables": "{\n  \"id\": \"{{alunoId2}}\",\n  \"input\": {\n    \"nomeResponsavel\": null\n  }\n}"
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/graphql",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "graphql"
+       ]
+      },
+      "description": "A coerência é validada sobre o estado final do aluno, não apenas sobre o input."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const r = pm.response.json();",
+         "pm.test('devolve erro', () => pm.expect(r.errors).to.be.an('array'));",
+         "pm.test('mensagem clara em portugues', () => pm.expect(r.errors[0].message).to.include('Informe o nome do responsável'));",
+         "pm.test('nao vaza erro bruto do MongoDB', () => pm.expect(r.errors[0].message).to.not.match(/E11000|duplicate key|stack/i));",
+         "pm.test('codigo BAD_USER_INPUT', () => pm.expect(r.errors[0].extensions.code).to.eql('BAD_USER_INPUT'));"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "06 - Atualizar aluno",
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{professorToken}}",
+        "type": "text"
+       }
+      ],
+      "body": {
+       "mode": "graphql",
+       "graphql": {
+        "query": "mutation AtualizarAluno($id: ID!, $input: AtualizarAlunoInput!) {\n  atualizarAluno(id: $id, input: $input) {\n    id\n    nome\n    nomeResponsavel\n    contatoResponsavel\n  }\n}\n",
+        "variables": "{\n  \"id\": \"{{alunoId}}\",\n  \"input\": {\n    \"nome\": \"Ana S. Souza\"\n  }\n}"
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/graphql",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "graphql"
+       ]
+      },
+      "description": "Envie apenas os campos que quer alterar. O professorId é sempre preservado."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const r = pm.response.json();",
+         "pm.test('sem erros', () => pm.expect(r.errors).to.be.undefined);",
+         "pm.test('nome alterado', () => pm.expect(r.data.atualizarAluno.nome).to.eql('Ana S. Souza'));"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "07 - Matricular aluno na turma",
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{professorToken}}",
+        "type": "text"
+       }
+      ],
+      "body": {
+       "mode": "graphql",
+       "graphql": {
+        "query": "mutation Matricular($alunoId: ID!, $turmaId: ID!) {\n  matricularAluno(alunoId: $alunoId, turmaId: $turmaId) {\n    id\n    periodoLetivo\n    status\n  }\n}\n",
+        "variables": "{\n  \"alunoId\": \"{{alunoId}}\",\n  \"turmaId\": \"{{turmaId}}\"\n}"
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/graphql",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "graphql"
+       ]
+      },
+      "description": "O periodoLetivo é copiado da turma. O cliente nunca escolhe o período."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const r = pm.response.json();",
+         "pm.test('sem erros', () => pm.expect(r.errors, JSON.stringify(r.errors)).to.be.undefined);",
+         "pm.collectionVariables.set('matriculaId', r.data.matricularAluno.id);",
+         "pm.test('matricula ativa', () => pm.expect(r.data.matricularAluno.status).to.eql('ativa'));",
+         "pm.test('periodo copiado da turma', () => pm.expect(r.data.matricularAluno.periodoLetivo).to.match(/^\\d{4}\\.[12]$/));"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "08 - Matricular segundo aluno na mesma turma",
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{professorToken}}",
+        "type": "text"
+       }
+      ],
+      "body": {
+       "mode": "graphql",
+       "graphql": {
+        "query": "mutation Matricular($alunoId: ID!, $turmaId: ID!) {\n  matricularAluno(alunoId: $alunoId, turmaId: $turmaId) {\n    id\n    periodoLetivo\n    status\n  }\n}\n",
+        "variables": "{\n  \"alunoId\": \"{{alunoId2}}\",\n  \"turmaId\": \"{{turmaId}}\"\n}"
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/graphql",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "graphql"
+       ]
+      },
+      "description": "Handoff para Pedro: a turma precisa terminar com pelo menos dois alunos matriculados."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const r = pm.response.json();",
+         "pm.test('sem erros', () => pm.expect(r.errors, JSON.stringify(r.errors)).to.be.undefined);",
+         "pm.collectionVariables.set('matriculaId2', r.data.matricularAluno.id);"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "09 - Conflito: mesma turma novamente",
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{professorToken}}",
+        "type": "text"
+       }
+      ],
+      "body": {
+       "mode": "graphql",
+       "graphql": {
+        "query": "mutation Matricular($alunoId: ID!, $turmaId: ID!) {\n  matricularAluno(alunoId: $alunoId, turmaId: $turmaId) {\n    id\n    periodoLetivo\n    status\n  }\n}\n",
+        "variables": "{\n  \"alunoId\": \"{{alunoId}}\",\n  \"turmaId\": \"{{turmaId}}\"\n}"
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/graphql",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "graphql"
+       ]
+      }
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const r = pm.response.json();",
+         "pm.test('devolve erro', () => pm.expect(r.errors).to.be.an('array'));",
+         "pm.test('mensagem clara em portugues', () => pm.expect(r.errors[0].message).to.include('já possui matrícula nesta turma'));",
+         "pm.test('nao vaza erro bruto do MongoDB', () => pm.expect(r.errors[0].message).to.not.match(/E11000|duplicate key|stack/i));",
+         "pm.test('codigo CONFLICT', () => pm.expect(r.errors[0].extensions.code).to.eql('CONFLICT'));"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "10 - Conflito: outra turma do mesmo período",
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{professorToken}}",
+        "type": "text"
+       }
+      ],
+      "body": {
+       "mode": "graphql",
+       "graphql": {
+        "query": "mutation Matricular($alunoId: ID!, $turmaId: ID!) {\n  matricularAluno(alunoId: $alunoId, turmaId: $turmaId) {\n    id\n    periodoLetivo\n    status\n  }\n}\n",
+        "variables": "{\n  \"alunoId\": \"{{alunoId}}\",\n  \"turmaId\": \"{{turmaIdMesmoPeriodo}}\"\n}"
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/graphql",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "graphql"
+       ]
+      },
+      "description": "Um aluno só pode estar em uma turma por semestre."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const r = pm.response.json();",
+         "pm.test('devolve erro', () => pm.expect(r.errors).to.be.an('array'));",
+         "pm.test('mensagem clara em portugues', () => pm.expect(r.errors[0].message).to.include('já possui matrícula em outra turma no período letivo'));",
+         "pm.test('nao vaza erro bruto do MongoDB', () => pm.expect(r.errors[0].message).to.not.match(/E11000|duplicate key|stack/i));",
+         "pm.test('codigo CONFLICT', () => pm.expect(r.errors[0].extensions.code).to.eql('CONFLICT'));"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "11 - Rematrícula em outro semestre",
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{professorToken}}",
+        "type": "text"
+       }
+      ],
+      "body": {
+       "mode": "graphql",
+       "graphql": {
+        "query": "mutation Matricular($alunoId: ID!, $turmaId: ID!) {\n  matricularAluno(alunoId: $alunoId, turmaId: $turmaId) {\n    id\n    periodoLetivo\n    status\n  }\n}\n",
+        "variables": "{\n  \"alunoId\": \"{{alunoId}}\",\n  \"turmaId\": \"{{turmaIdOutroSemestre}}\"\n}"
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/graphql",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "graphql"
+       ]
+      },
+      "description": "O histórico anterior é preservado."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const r = pm.response.json();",
+         "pm.test('sem erros', () => pm.expect(r.errors, JSON.stringify(r.errors)).to.be.undefined);",
+         "pm.collectionVariables.set('matriculaIdOutroSemestre', r.data.matricularAluno.id);"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "12 - Consultar histórico do aluno",
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{professorToken}}",
+        "type": "text"
+       }
+      ],
+      "body": {
+       "mode": "graphql",
+       "graphql": {
+        "query": "query Aluno($id: ID!) {\n  aluno(id: $id) {\n    id\n    nome\n    status\n    matriculas {\n      id\n      periodoLetivo\n      status\n      turma {\n        nome\n      }\n    }\n  }\n}\n",
+        "variables": "{\n  \"id\": \"{{alunoId}}\"\n}"
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/graphql",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "graphql"
+       ]
+      }
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const r = pm.response.json();",
+         "pm.test('sem erros', () => pm.expect(r.errors).to.be.undefined);",
+         "pm.test('duas matriculas no historico', () => pm.expect(r.data.aluno.matriculas.length).to.eql(2));"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "13 - Listar alunos da turma (matrícula ativa)",
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{professorToken}}",
+        "type": "text"
+       }
+      ],
+      "body": {
+       "mode": "graphql",
+       "graphql": {
+        "query": "query AlunosDaTurma($turmaId: ID!, $status: String) {\n  alunosDaTurma(turmaId: $turmaId, status: $status) {\n    id\n    nome\n    status\n  }\n}\n",
+        "variables": "{\n  \"turmaId\": \"{{turmaId}}\",\n  \"status\": \"ativa\"\n}"
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/graphql",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "graphql"
+       ]
+      },
+      "description": "Sem o argumento status, o padrão já é 'ativa'. Aceita ativa, encerrada ou todas."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const r = pm.response.json();",
+         "pm.test('sem erros', () => pm.expect(r.errors).to.be.undefined);",
+         "pm.test('dois alunos matriculados', () => pm.expect(r.data.alunosDaTurma.length).to.eql(2));"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "14 - Listar alunos da turma (histórico completo)",
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{professorToken}}",
+        "type": "text"
+       }
+      ],
+      "body": {
+       "mode": "graphql",
+       "graphql": {
+        "query": "query AlunosDaTurma($turmaId: ID!, $status: String) {\n  alunosDaTurma(turmaId: $turmaId, status: $status) {\n    id\n    nome\n    status\n  }\n}\n",
+        "variables": "{\n  \"turmaId\": \"{{turmaId}}\",\n  \"status\": \"todas\"\n}"
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/graphql",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "graphql"
+       ]
+      }
+     },
+     "response": []
+    },
+    {
+     "name": "15 - Inativar aluno",
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{professorToken}}",
+        "type": "text"
+       }
+      ],
+      "body": {
+       "mode": "graphql",
+       "graphql": {
+        "query": "mutation Inativar($id: ID!) {\n  inativarAluno(id: $id) {\n    id\n    status\n  }\n}\n",
+        "variables": "{\n  \"id\": \"{{alunoId}}\"\n}"
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/graphql",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "graphql"
+       ]
+      },
+      "description": "Exclusão lógica. Rode a requisição 12 depois para confirmar que as matrículas continuam existindo."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const r = pm.response.json();",
+         "pm.test('sem erros', () => pm.expect(r.errors).to.be.undefined);",
+         "pm.test('status inativo', () => pm.expect(r.data.inativarAluno.status).to.eql('inativo'));"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "16 - Reativar aluno",
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{professorToken}}",
+        "type": "text"
+       }
+      ],
+      "body": {
+       "mode": "graphql",
+       "graphql": {
+        "query": "mutation Reativar($id: ID!) {\n  reativarAluno(id: $id) {\n    id\n    status\n  }\n}\n",
+        "variables": "{\n  \"id\": \"{{alunoId}}\"\n}"
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/graphql",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "graphql"
+       ]
+      }
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const r = pm.response.json();",
+         "pm.test('sem erros', () => pm.expect(r.errors).to.be.undefined);",
+         "pm.test('status ativo', () => pm.expect(r.data.reativarAluno.status).to.eql('ativo'));"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "17 - Encerrar matrícula",
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{professorToken}}",
+        "type": "text"
+       }
+      ],
+      "body": {
+       "mode": "graphql",
+       "graphql": {
+        "query": "mutation Encerrar($id: ID!) {\n  encerrarMatricula(id: $id) {\n    id\n    status\n  }\n}\n",
+        "variables": "{\n  \"id\": \"{{matriculaIdOutroSemestre}}\"\n}"
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/graphql",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "graphql"
+       ]
+      },
+      "description": "O documento continua no MongoDB. Confirme com a requisição 12."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const r = pm.response.json();",
+         "pm.test('sem erros', () => pm.expect(r.errors).to.be.undefined);",
+         "pm.test('status encerrada', () => pm.expect(r.data.encerrarMatricula.status).to.eql('encerrada'));"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "18 - Sem autenticação",
+     "request": {
+      "method": "POST",
+      "header": [],
+      "body": {
+       "mode": "graphql",
+       "graphql": {
+        "query": "query Aluno($id: ID!) {\n  aluno(id: $id) {\n    id\n    nome\n    status\n    matriculas {\n      id\n      periodoLetivo\n      status\n      turma {\n        nome\n      }\n    }\n  }\n}\n",
+        "variables": "{\n  \"id\": \"{{alunoId}}\"\n}"
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/graphql",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "graphql"
+       ]
+      }
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const r = pm.response.json();",
+         "pm.test('devolve erro', () => pm.expect(r.errors).to.be.an('array'));",
+         "pm.test('mensagem clara em portugues', () => pm.expect(r.errors[0].message).to.include('Usuário não autenticado'));",
+         "pm.test('nao vaza erro bruto do MongoDB', () => pm.expect(r.errors[0].message).to.not.match(/E11000|duplicate key|stack/i));",
+         "pm.test('codigo UNAUTHENTICATED', () => pm.expect(r.errors[0].extensions.code).to.eql('UNAUTHENTICATED'));"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "19 - Isolamento: professor B não lê aluno de A",
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{professorTokenB}}",
+        "type": "text"
+       }
+      ],
+      "body": {
+       "mode": "graphql",
+       "graphql": {
+        "query": "query Aluno($id: ID!) {\n  aluno(id: $id) {\n    id\n    nome\n    status\n    matriculas {\n      id\n      periodoLetivo\n      status\n      turma {\n        nome\n      }\n    }\n  }\n}\n",
+        "variables": "{\n  \"id\": \"{{alunoId}}\"\n}"
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/graphql",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "graphql"
+       ]
+      },
+      "description": "Cadastre um segundo professor e guarde o token em professorTokenB."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const r = pm.response.json();",
+         "pm.test('nao devolve o aluno de outro professor', () => pm.expect(r.data.aluno).to.be.null);"
+        ]
+       }
+      }
+     ]
+    },
+    {
+     "name": "20 - Isolamento: professor B não matricula aluno de A",
+     "request": {
+      "method": "POST",
+      "header": [
+       {
+        "key": "Authorization",
+        "value": "Bearer {{professorTokenB}}",
+        "type": "text"
+       }
+      ],
+      "body": {
+       "mode": "graphql",
+       "graphql": {
+        "query": "mutation Matricular($alunoId: ID!, $turmaId: ID!) {\n  matricularAluno(alunoId: $alunoId, turmaId: $turmaId) {\n    id\n    periodoLetivo\n    status\n  }\n}\n",
+        "variables": "{\n  \"alunoId\": \"{{alunoId}}\",\n  \"turmaId\": \"{{turmaIdProfessorB}}\"\n}"
+       }
+      },
+      "url": {
+       "raw": "{{baseUrl}}/graphql",
+       "host": [
+        "{{baseUrl}}"
+       ],
+       "path": [
+        "graphql"
+       ]
+      },
+      "description": "A mensagem é sempre a mesma para não revelar a existência de recurso alheio (regra 13.3)."
+     },
+     "response": [],
+     "event": [
+      {
+       "listen": "test",
+       "script": {
+        "type": "text/javascript",
+        "exec": [
+         "const r = pm.response.json();",
+         "pm.test('devolve erro', () => pm.expect(r.errors).to.be.an('array'));",
+         "pm.test('mensagem clara em portugues', () => pm.expect(r.errors[0].message).to.include('Aluno não encontrado ou não pertence ao usuário'));",
+         "pm.test('nao vaza erro bruto do MongoDB', () => pm.expect(r.errors[0].message).to.not.match(/E11000|duplicate key|stack/i));",
+         "pm.test('codigo NOT_FOUND', () => pm.expect(r.errors[0].extensions.code).to.eql('NOT_FOUND'));"
+        ]
+       }
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "variable": [
+  {
+   "key": "baseUrl",
+   "value": "http://localhost:3000",
+   "type": "string"
+  },
+  {
+   "key": "professorToken",
+   "value": "",
+   "type": "string"
+  },
+  {
+   "key": "professorTokenB",
+   "value": "",
+   "type": "string"
+  },
+  {
+   "key": "adminToken",
+   "value": "",
+   "type": "string"
+  },
+  {
+   "key": "turmaId",
+   "value": "",
+   "type": "string"
+  },
+  {
+   "key": "turmaIdMesmoPeriodo",
+   "value": "",
+   "type": "string"
+  },
+  {
+   "key": "turmaIdOutroSemestre",
+   "value": "",
+   "type": "string"
+  },
+  {
+   "key": "turmaIdProfessorB",
+   "value": "",
+   "type": "string"
+  },
+  {
+   "key": "alunoId",
+   "value": "",
+   "type": "string"
+  },
+  {
+   "key": "alunoId2",
+   "value": "",
+   "type": "string"
+  },
+  {
+   "key": "matriculaId",
+   "value": "",
+   "type": "string"
+  },
+  {
+   "key": "matriculaId2",
+   "value": "",
+   "type": "string"
+  },
+  {
+   "key": "matriculaIdOutroSemestre",
+   "value": "",
+   "type": "string"
+  }
+ ]
 }

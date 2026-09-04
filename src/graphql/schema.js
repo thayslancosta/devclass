@@ -2,14 +2,30 @@ const gql = require('graphql-tag');
 const jwt = require('jsonwebtoken');
 const Usuario = require('../models/Usuario');
 
+// Fase 2 — Turmas e períodos letivos
+const turmaTypeDefs = require('./typeDefs/turmaTypeDefs');
+const turmaResolvers = require('./resolvers/turmaResolvers');
+
+// Fase 3 — Alunos, responsáveis e matrículas
+const alunoTypeDefs = require('./typeDefs/alunoTypeDefs');
+const alunoResolvers = require('./resolvers/alunoResolvers');
+const matriculaTypeDefs = require('./typeDefs/matriculaTypeDefs');
+const matriculaResolvers = require('./resolvers/matriculaResolvers');
+
 // Base do schema. As próximas fases devem importar seus próprios
-// typeDefs/resolvers aqui e mesclá-los (ex: com @graphql-tools/merge,
-// ou simplesmente concatenando arrays de typeDefs/resolvers).
-const typeDefs = gql`
+// typeDefs/resolvers aqui e mesclá-los, concatenando os arrays abaixo.
+const baseTypeDefs = gql`
   type Query {
     health: String!
   }
 `;
+
+const typeDefs = [
+  baseTypeDefs,
+  turmaTypeDefs,
+  alunoTypeDefs,
+  matriculaTypeDefs,
+];
 
 const resolvers = {
   Query: {
@@ -19,6 +35,23 @@ const resolvers = {
       }
       return `API funcionando. Usuário autenticado: ${context.usuario.email} (${context.usuario.perfil})`;
     },
+
+    ...turmaResolvers.Query,
+    ...alunoResolvers.Query,
+  },
+
+  Mutation: {
+    ...turmaResolvers.Mutation,
+    ...alunoResolvers.Mutation,
+    ...matriculaResolvers.Mutation,
+  },
+
+  Aluno: {
+    ...alunoResolvers.Aluno,
+  },
+
+  Matricula: {
+    ...matriculaResolvers.Matricula,
   },
 };
 
