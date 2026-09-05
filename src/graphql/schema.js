@@ -12,6 +12,12 @@ const alunoResolvers = require('./resolvers/alunoResolvers');
 const matriculaTypeDefs = require('./typeDefs/matriculaTypeDefs');
 const matriculaResolvers = require('./resolvers/matriculaResolvers');
 
+// Fase 4 — Aulas e registros diários
+const aulaTypeDefs = require('./typeDefs/aulaTypeDefs');
+const aulaResolvers = require('./resolvers/aulaResolvers');
+const registroTypeDefs = require('./typeDefs/registroTypeDefs');
+const registroResolvers = require('./resolvers/registroResolvers');
+
 // Base do schema. As próximas fases devem importar seus próprios
 // typeDefs/resolvers aqui e mesclá-los, concatenando os arrays abaixo.
 const baseTypeDefs = gql`
@@ -19,12 +25,13 @@ const baseTypeDefs = gql`
     health: String!
   }
 `;
-
 const typeDefs = [
   baseTypeDefs,
   turmaTypeDefs,
   alunoTypeDefs,
   matriculaTypeDefs,
+  aulaTypeDefs,
+  registroTypeDefs,
 ];
 
 const resolvers = {
@@ -36,15 +43,19 @@ const resolvers = {
       return `API funcionando. Usuário autenticado: ${context.usuario.email} (${context.usuario.perfil})`;
     },
 
-    ...turmaResolvers.Query,
-    ...alunoResolvers.Query,
+   ...turmaResolvers.Query,
+...alunoResolvers.Query,
+...aulaResolvers.Query,
+...registroResolvers.Query,
   },
 
-  Mutation: {
-    ...turmaResolvers.Mutation,
-    ...alunoResolvers.Mutation,
-    ...matriculaResolvers.Mutation,
-  },
+Mutation: {
+  ...turmaResolvers.Mutation,
+  ...alunoResolvers.Mutation,
+  ...matriculaResolvers.Mutation,
+  ...aulaResolvers.Mutation,
+  ...registroResolvers.Mutation,
+},
 
   Aluno: {
     ...alunoResolvers.Aluno,
@@ -84,3 +95,6 @@ async function contexto({ req }) {
 }
 
 module.exports = { typeDefs, resolvers, contexto };
+
+
+
