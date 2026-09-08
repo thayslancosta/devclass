@@ -35,6 +35,7 @@ const aulaTypeDefs = gql`
     criarAula(input: CriarAulaInput!): Aula!
     atualizarAula(id: ID!, input: AtualizarAulaInput!): Aula!
     arquivarAula(id: ID!): Aula!
+    restaurarAula(id: ID!): Aula!
   }
 `;
 

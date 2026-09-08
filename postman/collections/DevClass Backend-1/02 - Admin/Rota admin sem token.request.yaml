@@ -1,8 +1,0 @@
-$kind: http-request
-url: "{{baseUrl}}/admin/usuarios"
-method: POST
-body:
-  type: json
-  content: ""
-settings: {}
-order: 1000

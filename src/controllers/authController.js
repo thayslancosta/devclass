@@ -5,17 +5,22 @@ const { ErroApi } = require('../utils/erros');
 
 async function registrar(req, res, next) {
   try {
-    const { nome, email, senha } = req.body;
+    const { nome, email, senha } = req.body ?? {};
 
-    if (!nome || !nome.trim()) throw new ErroApi(400, 'Nome é obrigatório.');
-    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+    if (typeof nome !== 'string' || !nome.trim()) {
+      throw new ErroApi(400, 'Nome é obrigatório.');
+    }
+    if (typeof email !== 'string') {
       throw new ErroApi(400, 'Email em formato inválido.');
     }
-    if (!senha || senha.length < 6) {
+    const emailNormalizado = email.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailNormalizado)) {
+      throw new ErroApi(400, 'Email em formato inválido.');
+    }
+    if (typeof senha !== 'string' || senha.length < 6) {
       throw new ErroApi(400, 'Senha deve ter ao menos 6 caracteres.');
     }
 
-    const emailNormalizado = email.trim().toLowerCase();
     const existente = await Usuario.findOne({ email: emailNormalizado });
     if (existente) throw new ErroApi(409, 'Este email já está cadastrado.');
 
@@ -37,14 +42,23 @@ async function registrar(req, res, next) {
       ativo: usuario.ativo,
     });
   } catch (err) {
+    // A consulta anterior melhora a mensagem no caso comum, mas o índice
+    // único continua sendo a garantia contra dois cadastros simultâneos.
+    if (err && err.code === 11000) {
+      return next(new ErroApi(409, 'Este email já está cadastrado.'));
+    }
+
     next(err);
   }
 }
 
 async function login(req, res, next) {
   try {
-    const { email, senha } = req.body;
-    if (!email || !senha) {
+    const { email, senha } = req.body ?? {};
+    if (
+      typeof email !== 'string' || !email.trim() ||
+      typeof senha !== 'string' || !senha.length
+    ) {
       throw new ErroApi(400, 'Email e senha são obrigatórios.');
     }
 

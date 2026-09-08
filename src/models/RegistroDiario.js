@@ -88,4 +88,39 @@ const registroDiarioSchema = new mongoose.Schema(
   }
 );
 
+registroDiarioSchema.index(
+  { aulaId: 1, matriculaId: 1 },
+  { unique: true, partialFilterExpression: { status: 'ativo' } }
+);
+
+registroDiarioSchema.pre('validate', function validarConteudo(next) {
+  const temObservacao =
+    typeof this.observacaoGeral === 'string' &&
+    this.observacaoGeral.trim().length > 0;
+  const temAvaliacoes =
+    Array.isArray(this.avaliacoes) && this.avaliacoes.length > 0;
+
+  if (!temObservacao && !temAvaliacoes) {
+    this.invalidate(
+      'observacaoGeral',
+      'O registro deve possuir uma observação geral ou pelo menos uma avaliação.'
+    );
+  }
+
+  const avaliacaoOutraInvalida = (this.avaliacoes || []).some(
+    (avaliacao) =>
+      avaliacao.habilidade === 'outra' &&
+      (!avaliacao.outraDescricao || !avaliacao.outraDescricao.trim())
+  );
+
+  if (avaliacaoOutraInvalida) {
+    this.invalidate(
+      'avaliacoes',
+      'Quando a habilidade for "outra", outraDescricao é obrigatória.'
+    );
+  }
+
+  next();
+});
+
 module.exports = mongoose.model('RegistroDiario', registroDiarioSchema);

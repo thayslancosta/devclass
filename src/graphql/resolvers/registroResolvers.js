@@ -5,6 +5,9 @@ const RegistroDiario = require('../../models/RegistroDiario');
 const Aula = require('../../models/Aula');
 const Matricula = require('../../models/Matricula');
 const Turma = require('../../models/Turma');
+const Aluno = require('../../models/Aluno');
+const { montarPromptMensagemDiaria } = require('../../services/promptService');
+const { gerarTexto } = require('../../services/iaService');
 
 const HABILIDADES_VALIDAS = [
   'speaking',
@@ -24,15 +27,42 @@ const DESEMPENHOS_VALIDOS = [
   'precisa_de_atencao',
 ];
 
+const STATUS_REGISTRO = ['ativo', 'arquivado', 'todos'];
+const MENSAGEM_DUPLICIDADE = 'Já existe um registro diário ativo para esta matrícula nesta aula.';
+
 function erro(mensagem, code) {
   return new GraphQLError(mensagem, {
     extensions: { code },
   });
 }
 
+function tratarErroDuplicidade(falha) {
+  if (falha.code === 11000 || falha.code === 11001) {
+    throw erro(MENSAGEM_DUPLICIDADE, 'CONFLICT');
+  }
+
+  throw falha;
+}
+
+async function validarRegistroUnico(aulaId, matriculaId, id) {
+  const filtro = { aulaId, matriculaId, status: 'ativo' };
+  if (id) filtro._id = { $ne: id };
+
+  if (await RegistroDiario.findOne(filtro)) {
+    throw erro(MENSAGEM_DUPLICIDADE, 'CONFLICT');
+  }
+}
+
 function exigirUsuario(context) {
   if (!context.usuario) {
     throw erro('Usuário não autenticado.', 'UNAUTHENTICATED');
+  }
+
+  if (context.usuario.perfil !== 'professor') {
+    throw erro(
+      'Somente professores podem acessar dados pedagógicos.',
+      'FORBIDDEN'
+    );
   }
 
   return context.usuario;
@@ -45,13 +75,50 @@ function validarId(id, rotulo) {
 }
 
 function validarData(data, rotulo = 'data') {
-  const valor = new Date(data);
+  if (typeof data !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(data)) {
+    throw erro(`A ${rotulo} informada é inválida.`, 'BAD_USER_INPUT');
+  }
 
-  if (Number.isNaN(valor.getTime())) {
+  const valor = new Date(`${data}T00:00:00.000Z`);
+
+  if (Number.isNaN(valor.getTime()) || valor.toISOString().slice(0, 10) !== data) {
     throw erro(`A ${rotulo} informada é inválida.`, 'BAD_USER_INPUT');
   }
 
   return valor;
+}
+
+function validarDataNoPeriodo(data, periodoLetivo, rotulo) {
+  const valor = validarData(data, rotulo);
+  const ano = valor.getUTCFullYear();
+  const semestre = valor.getUTCMonth() < 6 ? 1 : 2;
+
+  if (`${ano}.${semestre}` !== periodoLetivo) {
+    throw erro(
+      `A ${rotulo} deve pertencer ao período letivo ${periodoLetivo}.`,
+      'BAD_USER_INPUT'
+    );
+  }
+
+  return valor;
+}
+
+function validarIntervalo(dataInicio, dataFim, periodoLetivo) {
+  const inicio = dataInicio
+    ? validarDataNoPeriodo(dataInicio, periodoLetivo, 'data inicial')
+    : null;
+  const fim = dataFim
+    ? validarDataNoPeriodo(dataFim, periodoLetivo, 'data final')
+    : null;
+
+  if (inicio && fim && inicio > fim) {
+    throw erro(
+      'A data inicial não pode ser posterior à data final.',
+      'BAD_USER_INPUT'
+    );
+  }
+
+  return { inicio, fim };
 }
 
 function validarAvaliacoes(avaliacoes) {
@@ -161,6 +228,31 @@ async function buscarMatriculaDoProfessor(id, usuario) {
   return matricula;
 }
 
+async function exigirEstruturaAtiva(aula, matricula, usuario) {
+  const turma = await buscarTurmaDoProfessor(aula.turmaId, usuario);
+
+  if (turma.status !== 'ativa') {
+    throw erro(
+      'A turma deve estar ativa para operar um registro ativo.',
+      'BAD_USER_INPUT'
+    );
+  }
+
+  if (matricula.status !== 'ativa') {
+    throw erro(
+      'A matrícula deve estar ativa para operar um registro ativo.',
+      'BAD_USER_INPUT'
+    );
+  }
+
+  if (aula.status !== 'ativa') {
+    throw erro(
+      'A aula deve estar ativa para operar um registro ativo.',
+      'BAD_USER_INPUT'
+    );
+  }
+}
+
 const registroResolvers = {
   Query: {
     registros: async (
@@ -179,22 +271,29 @@ const registroResolvers = {
         turmaId: matricula.turmaId,
       };
 
-      if (dataInicio || dataFim) {
+      const filtroStatus = status ?? 'ativo';
+
+      if (!STATUS_REGISTRO.includes(filtroStatus)) {
+        throw erro(
+          "Status de registro inválido. Use 'ativo', 'arquivado' ou 'todos'.",
+          'BAD_USER_INPUT'
+        );
+      }
+
+      if (filtroStatus === 'ativo') {
+        filtroAula.status = 'ativa';
+      }
+
+      const { inicio, fim } = validarIntervalo(
+        dataInicio,
+        dataFim,
+        matricula.periodoLetivo
+      );
+
+      if (inicio || fim) {
         filtroAula.data = {};
-
-        if (dataInicio) {
-          filtroAula.data.$gte = validarData(
-            dataInicio,
-            'data inicial'
-          );
-        }
-
-        if (dataFim) {
-          filtroAula.data.$lte = validarData(
-            dataFim,
-            'data final'
-          );
-        }
+        if (inicio) filtroAula.data.$gte = inicio;
+        if (fim) filtroAula.data.$lte = fim;
       }
 
       const aulas = await Aula.find(filtroAula).select('_id');
@@ -205,8 +304,8 @@ const registroResolvers = {
         aulaId: { $in: aulaIds },
       };
 
-      if (status) {
-        filtro.status = status;
+      if (filtroStatus !== 'todos') {
+        filtro.status = filtroStatus;
       }
 
       return RegistroDiario.find(filtro).sort({ createdAt: -1 });
@@ -214,6 +313,49 @@ const registroResolvers = {
   },
 
   Mutation: {
+    gerarMensagemDiaria: async (_parent, { id }, context) => {
+      const usuario = exigirUsuario(context);
+      validarId(id, 'do registro');
+      const registro = await RegistroDiario.findById(id);
+      if (!registro) throw erro('Registro não encontrado.', 'NOT_FOUND');
+
+      const aula = await buscarAulaDoProfessor(registro.aulaId, usuario);
+      const matricula = await buscarMatriculaDoProfessor(registro.matriculaId, usuario);
+      const aluno = await Aluno.findOne({
+        _id: matricula.alunoId, professorId: usuario.id,
+      }).select('nome generoGramatical nomeResponsavel generoResponsavel');
+      if (!aluno) throw erro('Aluno não encontrado.', 'NOT_FOUND');
+      if (String(aula.turmaId) !== String(matricula.turmaId)) {
+        throw erro('O registro possui aula e matrícula de turmas diferentes.', 'BAD_USER_INPUT');
+      }
+      if (registro.status !== 'ativo') {
+        throw erro('O registro deve estar ativo para gerar uma mensagem.', 'BAD_USER_INPUT');
+      }
+      await exigirEstruturaAtiva(aula, matricula, usuario);
+      const turma = await buscarTurmaDoProfessor(aula.turmaId, usuario);
+      const prompt = montarPromptMensagemDiaria({
+        aluno: {
+          nome: aluno.nome, generoGramatical: aluno.generoGramatical,
+          nomeResponsavel: aluno.nomeResponsavel, generoResponsavel: aluno.generoResponsavel,
+        },
+        turma: { nome: turma.nome, estagio: turma.estagio, periodoLetivo: turma.periodoLetivo },
+        aula: { data: aula.data, topicos: [...(aula.topicos || [])] },
+        registro: {
+          observacaoGeral: registro.observacaoGeral,
+          avaliacoes: (registro.avaliacoes || []).map(avaliacao => ({
+            habilidade: avaliacao.habilidade, desempenho: avaliacao.desempenho,
+            observacao: avaliacao.observacao, outraDescricao: avaliacao.outraDescricao,
+          })),
+        },
+      });
+      const texto = await gerarTexto(prompt);
+      registro.mensagemIAOriginal = texto;
+      registro.mensagemEditada = texto;
+      registro.geradaEm = new Date();
+      await registro.save();
+      return registro;
+    },
+
     adicionarRegistro: async (_parent, { input }, context) => {
       const usuario = exigirUsuario(context);
 
@@ -247,19 +389,20 @@ const registroResolvers = {
         );
       }
 
-      if (matricula.status !== 'ativa') {
-        throw erro(
-          'Não é possível registrar dados para uma matrícula encerrada.',
-          'BAD_USER_INPUT'
-        );
-      }
+      await exigirEstruturaAtiva(aula, matricula, usuario);
 
-      return RegistroDiario.create({
-        aulaId: input.aulaId,
-        matriculaId: input.matriculaId,
-        observacaoGeral: input.observacaoGeral,
-        avaliacoes: input.avaliacoes || [],
-      });
+      await validarRegistroUnico(input.aulaId, input.matriculaId);
+
+      try {
+        return await RegistroDiario.create({
+          aulaId: input.aulaId,
+          matriculaId: input.matriculaId,
+          observacaoGeral: input.observacaoGeral,
+          avaliacoes: input.avaliacoes || [],
+        });
+      } catch (falha) {
+        tratarErroDuplicidade(falha);
+      }
     },
 
     atualizarRegistro: async (_parent, { id, input }, context) => {
@@ -291,6 +434,10 @@ const registroResolvers = {
           'O registro possui aula e matrícula de turmas diferentes.',
           'BAD_USER_INPUT'
         );
+      }
+
+      if (registro.status === 'ativo') {
+        await exigirEstruturaAtiva(aula, matricula, usuario);
       }
 
       const novaObservacao =
@@ -326,16 +473,25 @@ const registroResolvers = {
     arquivarRegistro: async (_parent, { id }, context) => {
       const usuario = exigirUsuario(context);
 
+      validarId(id, 'do registro');
+
       const registro = await RegistroDiario.findById(id);
 
       if (!registro) {
         throw erro('Registro não encontrado.', 'NOT_FOUND');
       }
 
-      await buscarAulaDoProfessor(
-        registro.aulaId,
-        usuario
-      );
+      const [aula, matricula] = await Promise.all([
+        buscarAulaDoProfessor(registro.aulaId, usuario),
+        buscarMatriculaDoProfessor(registro.matriculaId, usuario),
+      ]);
+
+      if (matricula.turmaId.toString() !== aula.turmaId.toString()) {
+        throw erro(
+          'O registro possui aula e matrícula de turmas diferentes.',
+          'BAD_USER_INPUT'
+        );
+      }
 
       registro.status = 'arquivado';
 
@@ -347,20 +503,36 @@ const registroResolvers = {
     restaurarRegistro: async (_parent, { id }, context) => {
       const usuario = exigirUsuario(context);
 
+      validarId(id, 'do registro');
+
       const registro = await RegistroDiario.findById(id);
 
       if (!registro) {
         throw erro('Registro não encontrado.', 'NOT_FOUND');
       }
 
-      await buscarAulaDoProfessor(
-        registro.aulaId,
-        usuario
-      );
+      const [aula, matricula] = await Promise.all([
+        buscarAulaDoProfessor(registro.aulaId, usuario),
+        buscarMatriculaDoProfessor(registro.matriculaId, usuario),
+      ]);
+
+      if (matricula.turmaId.toString() !== aula.turmaId.toString()) {
+        throw erro(
+          'O registro possui aula e matrícula de turmas diferentes.',
+          'BAD_USER_INPUT'
+        );
+      }
+
+      await exigirEstruturaAtiva(aula, matricula, usuario);
+      await validarRegistroUnico(registro.aulaId, registro.matriculaId, registro._id);
 
       registro.status = 'ativo';
 
-      await registro.save();
+      try {
+        await registro.save();
+      } catch (falha) {
+        tratarErroDuplicidade(falha);
+      }
 
       return registro;
     },
@@ -380,10 +552,21 @@ const registroResolvers = {
         throw erro('Registro não encontrado.', 'NOT_FOUND');
       }
 
-      await buscarAulaDoProfessor(
-        registro.aulaId,
-        usuario
-      );
+      const [aula, matricula] = await Promise.all([
+        buscarAulaDoProfessor(registro.aulaId, usuario),
+        buscarMatriculaDoProfessor(registro.matriculaId, usuario),
+      ]);
+
+      if (matricula.turmaId.toString() !== aula.turmaId.toString()) {
+        throw erro(
+          'O registro possui aula e matrícula de turmas diferentes.',
+          'BAD_USER_INPUT'
+        );
+      }
+
+      if (registro.status === 'ativo') {
+        await exigirEstruturaAtiva(aula, matricula, usuario);
+      }
 
       registro.mensagemEditada = texto;
 
