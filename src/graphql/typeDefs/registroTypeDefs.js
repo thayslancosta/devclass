@@ -51,6 +51,7 @@ const registroTypeDefs = gql`
   }
 
   extend type Mutation {
+    gerarMensagemDiaria(id: ID!): RegistroDiario!
     adicionarRegistro(input: CriarRegistroInput!): RegistroDiario!
     atualizarRegistro(
       id: ID!

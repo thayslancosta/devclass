@@ -1,0 +1,827 @@
+{
+  "info": {
+    "_postman_id": "06d84bd1-e096-48ca-906a-5f6830058a25",
+    "name": "DevClass — Fluxo de Apresentação",
+    "description": "Fluxo de 15 etapas aprovado para a apresentação do DevClass.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Fluxo aprovado",
+      "item": [
+        {
+          "name": "01 — Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{emailProfessor}}\",\n  \"senha\": \"{{senhaProfessor}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/auth/login"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let resposta;",
+                  "try { resposta = pm.response.json(); } catch { resposta = null; }",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Resposta JSON', () => pm.expect(resposta).to.be.an('object'));",
+                  "pm.test('Token retornado', () => {",
+                  "  const token = resposta && resposta.token;",
+                  "  pm.expect(token).to.be.a('string').and.not.empty;",
+                  "  if (typeof token === 'string' && token.length > 0) pm.collectionVariables.set('token', token);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "02 — Criar turma",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation ($input: TurmaInput!) { criarTurma(input: $input) { id nome estagio periodoLetivo status } }\",\n  \"variables\": {\n    \"input\": {\n      \"nome\": \"Turma Apresentação\",\n      \"estagio\": \"A2\",\n      \"periodoLetivo\": \"2026.2\",\n      \"encontros\": [\n        {\n          \"diaSemana\": \"segunda\",\n          \"horario\": \"14:00\"\n        }\n      ]\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/graphql"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let resposta;",
+                  "try { resposta = pm.response.json(); } catch { resposta = null; }",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Resposta JSON', () => pm.expect(resposta).to.be.an('object'));",
+                  "pm.test('GraphQL sem errors', () => pm.expect(resposta.errors).to.eql(undefined));",
+                  "pm.test('Objeto criarTurma retornado', () => {",
+                  "  const resultado = resposta && resposta.data && resposta.data.criarTurma;",
+                  "  pm.expect(resultado).to.be.an('object');",
+                  "});",
+                  "pm.test('status ativa', () => pm.expect(resposta.data.criarTurma.status).to.eql('ativa'));",
+                  "pm.test('Salvar turmaId', () => {",
+                  "  const valor = resposta.data.criarTurma.id;",
+                  "  pm.expect(valor).to.be.a('string').and.not.empty;",
+                  "  if (typeof valor === 'string' && valor.length > 0) pm.collectionVariables.set('turmaId', valor);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "03 — Criar aluno",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation ($input: CriarAlunoInput!) { criarAluno(input: $input) { id nome generoGramatical nomeResponsavel generoResponsavel contatoResponsavel status } }\",\n  \"variables\": {\n    \"input\": {\n      \"nome\": \"Ana Apresentação\",\n      \"generoGramatical\": \"feminino\",\n      \"nomeResponsavel\": \"Marina\",\n      \"generoResponsavel\": \"feminino\",\n      \"contatoResponsavel\": \"marina@example.com\"\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/graphql"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let resposta;",
+                  "try { resposta = pm.response.json(); } catch { resposta = null; }",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Resposta JSON', () => pm.expect(resposta).to.be.an('object'));",
+                  "pm.test('GraphQL sem errors', () => pm.expect(resposta.errors).to.eql(undefined));",
+                  "pm.test('Objeto criarAluno retornado', () => {",
+                  "  const resultado = resposta && resposta.data && resposta.data.criarAluno;",
+                  "  pm.expect(resultado).to.be.an('object');",
+                  "});",
+                  "pm.test('status ativo', () => pm.expect(resposta.data.criarAluno.status).to.eql('ativo'));",
+                  "pm.test('Salvar alunoId', () => {",
+                  "  const valor = resposta.data.criarAluno.id;",
+                  "  pm.expect(valor).to.be.a('string').and.not.empty;",
+                  "  if (typeof valor === 'string' && valor.length > 0) pm.collectionVariables.set('alunoId', valor);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "04 — Matricular aluno",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation ($alunoId: ID!, $turmaId: ID!) { matricularAluno(alunoId: $alunoId, turmaId: $turmaId) { id alunoId turmaId status } }\",\n  \"variables\": {\n    \"alunoId\": \"{{alunoId}}\",\n    \"turmaId\": \"{{turmaId}}\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/graphql"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let resposta;",
+                  "try { resposta = pm.response.json(); } catch { resposta = null; }",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Resposta JSON', () => pm.expect(resposta).to.be.an('object'));",
+                  "pm.test('GraphQL sem errors', () => pm.expect(resposta.errors).to.eql(undefined));",
+                  "pm.test('Objeto matricularAluno retornado', () => {",
+                  "  const resultado = resposta && resposta.data && resposta.data.matricularAluno;",
+                  "  pm.expect(resultado).to.be.an('object');",
+                  "});",
+                  "pm.test('status ativa', () => pm.expect(resposta.data.matricularAluno.status).to.eql('ativa'));",
+                  "pm.test('Salvar matriculaId', () => {",
+                  "  const valor = resposta.data.matricularAluno.id;",
+                  "  pm.expect(valor).to.be.a('string').and.not.empty;",
+                  "  if (typeof valor === 'string' && valor.length > 0) pm.collectionVariables.set('matriculaId', valor);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "05 — Criar aula",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation ($input: CriarAulaInput!) { criarAula(input: $input) { id turmaId data topicos status } }\",\n  \"variables\": {\n    \"input\": {\n      \"turmaId\": \"{{turmaId}}\",\n      \"data\": \"2026-09-08\",\n      \"topicos\": [\n        \"Present perfect\",\n        \"Experiências pessoais\"\n      ]\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/graphql"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let resposta;",
+                  "try { resposta = pm.response.json(); } catch { resposta = null; }",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Resposta JSON', () => pm.expect(resposta).to.be.an('object'));",
+                  "pm.test('GraphQL sem errors', () => pm.expect(resposta.errors).to.eql(undefined));",
+                  "pm.test('Objeto criarAula retornado', () => {",
+                  "  const resultado = resposta && resposta.data && resposta.data.criarAula;",
+                  "  pm.expect(resultado).to.be.an('object');",
+                  "});",
+                  "pm.test('status ativa', () => pm.expect(resposta.data.criarAula.status).to.eql('ativa'));",
+                  "pm.test('Salvar aulaId', () => {",
+                  "  const valor = resposta.data.criarAula.id;",
+                  "  pm.expect(valor).to.be.a('string').and.not.empty;",
+                  "  if (typeof valor === 'string' && valor.length > 0) pm.collectionVariables.set('aulaId', valor);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "06 — Adicionar registro diário",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation ($input: CriarRegistroInput!) { adicionarRegistro(input: $input) { id aulaId matriculaId observacaoGeral avaliacoes { habilidade desempenho observacao } status } }\",\n  \"variables\": {\n    \"input\": {\n      \"aulaId\": \"{{aulaId}}\",\n      \"matriculaId\": \"{{matriculaId}}\",\n      \"observacaoGeral\": \"Participou bem das atividades em dupla.\",\n      \"avaliacoes\": [\n        {\n          \"habilidade\": \"speaking\",\n          \"desempenho\": \"destaque\",\n          \"observacao\": \"Falou com confiança e utilizou o conteúdo da aula.\"\n        },\n        {\n          \"habilidade\": \"listening\",\n          \"desempenho\": \"precisa_de_atencao\",\n          \"observacao\": \"Precisou ouvir algumas instruções novamente.\"\n        }\n      ]\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/graphql"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let resposta;",
+                  "try { resposta = pm.response.json(); } catch { resposta = null; }",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Resposta JSON', () => pm.expect(resposta).to.be.an('object'));",
+                  "pm.test('GraphQL sem errors', () => pm.expect(resposta.errors).to.eql(undefined));",
+                  "pm.test('Objeto adicionarRegistro retornado', () => {",
+                  "  const resultado = resposta && resposta.data && resposta.data.adicionarRegistro;",
+                  "  pm.expect(resultado).to.be.an('object');",
+                  "});",
+                  "pm.test('Duas avaliações retornadas', () => pm.expect(resposta.data.adicionarRegistro.avaliacoes).to.have.lengthOf(2));",
+                  "pm.test('status ativo', () => pm.expect(resposta.data.adicionarRegistro.status).to.eql('ativo'));",
+                  "pm.test('Salvar registroId', () => {",
+                  "  const valor = resposta.data.adicionarRegistro.id;",
+                  "  pm.expect(valor).to.be.a('string').and.not.empty;",
+                  "  if (typeof valor === 'string' && valor.length > 0) pm.collectionVariables.set('registroId', valor);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "07 — Gerar mensagem diária com IA",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation ($id: ID!) { gerarMensagemDiaria(id: $id) { id mensagemIAOriginal mensagemEditada geradaEm status } }\",\n  \"variables\": {\n    \"id\": \"{{registroId}}\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/graphql"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let resposta;",
+                  "try { resposta = pm.response.json(); } catch { resposta = null; }",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Resposta JSON', () => pm.expect(resposta).to.be.an('object'));",
+                  "pm.test('GraphQL sem errors', () => pm.expect(resposta.errors).to.eql(undefined));",
+                  "pm.test('Objeto gerarMensagemDiaria retornado', () => {",
+                  "  const resultado = resposta && resposta.data && resposta.data.gerarMensagemDiaria;",
+                  "  pm.expect(resultado).to.be.an('object');",
+                  "});",
+                  "pm.test('Mensagem gerada', () => {",
+                  "  const resultado = resposta.data.gerarMensagemDiaria;",
+                  "  pm.expect(resultado.mensagemIAOriginal).to.be.a('string').and.not.empty;",
+                  "  pm.expect(resultado.mensagemEditada).to.be.a('string').and.not.empty;",
+                  "  pm.expect(resultado.geradaEm).to.be.a('string').and.not.empty;",
+                  "});",
+                  "pm.test('status ativo', () => pm.expect(resposta.data.gerarMensagemDiaria.status).to.eql('ativo'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "08 — Editar mensagem diária",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation ($id: ID!, $texto: String!) { editarMensagemDiaria(id: $id, texto: $texto) { id mensagemIAOriginal mensagemEditada geradaEm status } }\",\n  \"variables\": {\n    \"id\": \"{{registroId}}\",\n    \"texto\": \"Mensagem revisada pelo professor.\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/graphql"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let resposta;",
+                  "try { resposta = pm.response.json(); } catch { resposta = null; }",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Resposta JSON', () => pm.expect(resposta).to.be.an('object'));",
+                  "pm.test('GraphQL sem errors', () => pm.expect(resposta.errors).to.eql(undefined));",
+                  "pm.test('Objeto editarMensagemDiaria retornado', () => {",
+                  "  const resultado = resposta && resposta.data && resposta.data.editarMensagemDiaria;",
+                  "  pm.expect(resultado).to.be.an('object');",
+                  "});",
+                  "pm.test('Mensagem editada', () => pm.expect(resposta.data.editarMensagemDiaria.mensagemEditada).to.eql('Mensagem revisada pelo professor.'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "09 — Gerar feedback parcial com IA",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation ($input: GerarFeedbacksInput!) { gerarFeedbacks(input: $input) { id matriculaId tipo textoIAOriginal textoEditado geradoPorIA geradoEm statusEnvio enviadoEm status } }\",\n  \"variables\": {\n    \"input\": {\n      \"matriculaIds\": [\n        \"{{matriculaId}}\"\n      ],\n      \"tipo\": \"parcial\"\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/graphql"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let resposta;",
+                  "try { resposta = pm.response.json(); } catch { resposta = null; }",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Resposta JSON', () => pm.expect(resposta).to.be.an('object'));",
+                  "pm.test('GraphQL sem errors', () => pm.expect(resposta.errors).to.eql(undefined));",
+                  "pm.test('Objeto gerarFeedbacks retornado', () => {",
+                  "  const resultado = resposta && resposta.data && resposta.data.gerarFeedbacks;",
+                  "  pm.expect(resultado).to.be.an('array').that.is.not.empty;",
+                  "});",
+                  "pm.test('Feedback gerado como rascunho', () => {",
+                  "  const resultado = resposta.data.gerarFeedbacks[0];",
+                  "  pm.expect(resultado.textoIAOriginal).to.be.a('string').and.not.empty;",
+                  "  pm.expect(resultado.textoEditado).to.be.a('string').and.not.empty;",
+                  "  pm.expect(resultado.geradaEm).to.be.a('string').and.not.empty;",
+                  "  pm.expect(resultado.geradoPorIA).to.eql(true);",
+                  "  pm.expect(resultado.statusEnvio).to.eql('rascunho');",
+                  "  pm.expect(resultado.status).to.eql('ativo');",
+                  "});",
+                  "pm.test('status ativo', () => pm.expect(resposta.data.gerarFeedbacks[0].status).to.eql('ativo'));",
+                  "pm.test('Salvar feedbackId', () => {",
+                  "  const valor = resposta.data.gerarFeedbacks[0].id;",
+                  "  pm.expect(valor).to.be.a('string').and.not.empty;",
+                  "  if (typeof valor === 'string' && valor.length > 0) pm.collectionVariables.set('feedbackId', valor);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "10 — Listar feedbacks",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query ($matriculaId: ID!) { feedbacks(matriculaId: $matriculaId, status: \\\"ativo\\\") { id matriculaId tipo textoEditado geradoPorIA statusEnvio status } }\",\n  \"variables\": {\n    \"matriculaId\": \"{{matriculaId}}\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/graphql"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let resposta;",
+                  "try { resposta = pm.response.json(); } catch { resposta = null; }",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Resposta JSON', () => pm.expect(resposta).to.be.an('object'));",
+                  "pm.test('GraphQL sem errors', () => pm.expect(resposta.errors).to.eql(undefined));",
+                  "pm.test('Objeto feedbacks retornado', () => {",
+                  "  const resultado = resposta && resposta.data && resposta.data.feedbacks;",
+                  "  pm.expect(resultado).to.be.an('array').that.is.not.empty;",
+                  "});",
+                  "pm.test('Feedback parcial listado', () => pm.expect(resposta.data.feedbacks.some(item => item.tipo === 'parcial')).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "11 — Editar feedback",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation ($id: ID!, $texto: String!) { editarFeedback(id: $id, texto: $texto) { id textoIAOriginal textoEditado statusEnvio status } }\",\n  \"variables\": {\n    \"id\": \"{{feedbackId}}\",\n    \"texto\": \"Feedback revisado e aprovado pelo professor.\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/graphql"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let resposta;",
+                  "try { resposta = pm.response.json(); } catch { resposta = null; }",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Resposta JSON', () => pm.expect(resposta).to.be.an('object'));",
+                  "pm.test('GraphQL sem errors', () => pm.expect(resposta.errors).to.eql(undefined));",
+                  "pm.test('Objeto editarFeedback retornado', () => {",
+                  "  const resultado = resposta && resposta.data && resposta.data.editarFeedback;",
+                  "  pm.expect(resultado).to.be.an('object');",
+                  "});",
+                  "pm.test('Feedback editado', () => pm.expect(resposta.data.editarFeedback.textoEditado).to.eql('Feedback revisado e aprovado pelo professor.'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "12 — Confirmar envio do feedback",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation ($id: ID!) { marcarFeedbackEnviado(id: $id) { id textoEditado statusEnvio enviadoEm status } }\",\n  \"variables\": {\n    \"id\": \"{{feedbackId}}\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/graphql"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let resposta;",
+                  "try { resposta = pm.response.json(); } catch { resposta = null; }",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Resposta JSON', () => pm.expect(resposta).to.be.an('object'));",
+                  "pm.test('GraphQL sem errors', () => pm.expect(resposta.errors).to.eql(undefined));",
+                  "pm.test('Objeto marcarFeedbackEnviado retornado', () => {",
+                  "  const resultado = resposta && resposta.data && resposta.data.marcarFeedbackEnviado;",
+                  "  pm.expect(resultado).to.be.an('object');",
+                  "});",
+                  "pm.test('Envio confirmado', () => { pm.expect(resposta.data.marcarFeedbackEnviado.statusEnvio).to.eql('enviado'); pm.expect(resposta.data.marcarFeedbackEnviado.enviadoEm).to.be.a('string').and.not.empty; });",
+                  "pm.test('statusEnvio enviado', () => pm.expect(resposta.data.marcarFeedbackEnviado.statusEnvio).to.eql('enviado'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "13 — Bloqueio de edição após envio",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation ($id: ID!, $texto: String!) { editarFeedback(id: $id, texto: $texto) { id textoEditado statusEnvio } }\",\n  \"variables\": {\n    \"id\": \"{{feedbackId}}\",\n    \"texto\": \"Tentativa de alteração.\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/graphql"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let resposta;",
+                  "try { resposta = pm.response.json(); } catch { resposta = null; }",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Resposta JSON', () => pm.expect(resposta).to.be.an('object'));",
+                  "pm.test('Edição bloqueada com CONFLICT', () => {",
+                  "  pm.expect(resposta.errors).to.be.an('array').that.is.not.empty;",
+                  "  pm.expect(resposta.data).to.eql(null);",
+                  "  pm.expect(resposta.errors[0].extensions.code).to.eql('CONFLICT');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "14 — Arquivar feedback",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation ($id: ID!) { arquivarFeedback(id: $id) { id tipo statusEnvio status } }\",\n  \"variables\": {\n    \"id\": \"{{feedbackId}}\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/graphql"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let resposta;",
+                  "try { resposta = pm.response.json(); } catch { resposta = null; }",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Resposta JSON', () => pm.expect(resposta).to.be.an('object'));",
+                  "pm.test('GraphQL sem errors', () => pm.expect(resposta.errors).to.eql(undefined));",
+                  "pm.test('Objeto arquivarFeedback retornado', () => {",
+                  "  const resultado = resposta && resposta.data && resposta.data.arquivarFeedback;",
+                  "  pm.expect(resultado).to.be.an('object');",
+                  "});",
+                  "pm.test('status arquivado', () => pm.expect(resposta.data.arquivarFeedback.status).to.eql('arquivado'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "15 — Consultar histórico",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query ($matriculaId: ID!) { feedbacks(matriculaId: $matriculaId, status: \\\"todos\\\") { id tipo textoEditado statusEnvio enviadoEm status } }\",\n  \"variables\": {\n    \"matriculaId\": \"{{matriculaId}}\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/graphql"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let resposta;",
+                  "try { resposta = pm.response.json(); } catch { resposta = null; }",
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Resposta JSON', () => pm.expect(resposta).to.be.an('object'));",
+                  "pm.test('GraphQL sem errors', () => pm.expect(resposta.errors).to.eql(undefined));",
+                  "pm.test('Objeto feedbacks retornado', () => {",
+                  "  const resultado = resposta && resposta.data && resposta.data.feedbacks;",
+                  "  pm.expect(resultado).to.be.an('array').that.is.not.empty;",
+                  "});",
+                  "pm.test('Feedback arquivado no histórico', () => pm.expect(resposta.data.feedbacks.some(item => item.id === pm.collectionVariables.get('feedbackId') && item.status === 'arquivado')).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "emailProfessor",
+      "value": "professor.demo@example.com",
+      "type": "string"
+    },
+    {
+      "key": "senhaProfessor",
+      "value": "123456",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "turmaId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "alunoId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "matriculaId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "aulaId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "registroId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "feedbackId",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

@@ -19,6 +19,13 @@ function exigirUsuario(context) {
     throw erro('Usuário não autenticado.', 'UNAUTHENTICATED');
   }
 
+  if (context.usuario.perfil !== 'professor') {
+    throw erro(
+      'Somente professores podem acessar dados pedagógicos.',
+      'FORBIDDEN'
+    );
+  }
+
   return context.usuario;
 }
 
@@ -166,10 +173,18 @@ const alunoResolvers = {
         return [];
       }
 
-      return Aluno.find({
+      const filtroAluno = {
         _id: { $in: matriculas.map((matricula) => matricula.alunoId) },
         professorId: usuario.id,
-      }).sort({ nome: 1 });
+      };
+
+      // A visão operacional padrão não exibe alunos inativos. Consultas
+      // históricas continuam disponíveis com status encerrada/todas.
+      if (filtroStatus === 'ativa') {
+        filtroAluno.status = 'ativo';
+      }
+
+      return Aluno.find(filtroAluno).sort({ nome: 1 });
     },
   },
 

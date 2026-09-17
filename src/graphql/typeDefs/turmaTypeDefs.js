@@ -26,7 +26,13 @@ const turmaTypeDefs = gql`
     nome: String!
     estagio: String!
     periodoLetivo: String!
-    encontros: [EncontroInput!]
+    encontros: [EncontroInput!]!
+  }
+
+  input AtualizarTurmaInput {
+    nome: String!
+    estagio: String!
+    encontros: [EncontroInput!]!
   }
 
   extend type Query {
@@ -37,7 +43,7 @@ const turmaTypeDefs = gql`
 
         type Mutation {
     criarTurma(input: TurmaInput!): Turma!
-    atualizarTurma(id: ID!, input: TurmaInput!): Turma!
+    atualizarTurma(id: ID!, input: AtualizarTurmaInput!): Turma!
     encerrarTurma(id: ID!): Turma!
     reativarTurma(id: ID!): Turma!
   }

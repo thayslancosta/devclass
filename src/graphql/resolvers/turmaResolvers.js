@@ -25,6 +25,13 @@ function exigirUsuario(context) {
     throw erro('Usuário não autenticado.', 'UNAUTHENTICATED');
   }
 
+  if (context.usuario.perfil !== 'professor') {
+    throw erro(
+      'Somente professores podem acessar dados pedagógicos.',
+      'FORBIDDEN'
+    );
+  }
+
   return context.usuario;
 }
 

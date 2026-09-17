@@ -1,266 +1,413 @@
-# DevClass — Diário de Evolução Pedagógica com IA
+# DevClass
 
-Backend do projeto DevClass. Documento canônico de requisitos: `Definicao_Atualizada_Projeto_DevClass.pdf`.
-Roteiro de implementação por fases: `Plano_Implementacao_DevClass.pdf`.
+O DevClass é o backend de um diário de evolução pedagógica para professores de uma escola de línguas. Ele organiza turmas, alunos, matrículas, aulas e registros e permite preparar mensagens e feedbacks a partir das evidências registradas pelo professor.
 
-## Stack
+## Funcionalidades
 
-- Node.js (CommonJS) + Express 5
-- MongoDB Atlas + Mongoose
-- Autenticação JWT (Bearer Token)
-- Apollo Server (GraphQL) para o domínio pedagógico
-- OpenAI (integrada a partir da Fase 5)
+- Cadastro e login de professores com autenticação JWT.
+- Administração de usuários por conta com perfil `admin`.
+- Cadastro de turmas e consulta por período letivo.
+- Cadastro de alunos, responsáveis e matrículas.
+- Aulas e registros pedagógicos com múltiplas habilidades.
+- Arquivamento lógico e consulta do histórico.
+- Geração sob solicitação de mensagens diárias e feedbacks parciais ou finais com a OpenAI.
+- Edição dos textos antes do envio e confirmação manual de envio.
 
-## Como rodar o projeto
+A aplicação não envia mensagens por email, WhatsApp ou outro canal. O campo de envio registra somente a confirmação feita pelo professor depois da comunicação ocorrer fora do sistema.
 
-### 1. Pré-requisitos
-- Node.js instalado
-- Um cluster MongoDB Atlas (free tier já é suficiente) com um usuário de banco criado e o IP liberado em Network Access
+## Tecnologias
 
-### 2. Instalar dependências
+- Node.js e CommonJS
+- Express 5
+- Apollo Server 5 e GraphQL
+- MongoDB com Mongoose
+- JSON Web Token
+- bcryptjs
+- dotenv
+- SDK OpenAI
+
+## Organização da aplicação
+
+- `src/controllers`: regras das rotas REST de autenticação e administração.
+- `src/routes`: definição dos endereços REST.
+- `src/middlewares`: autenticação e autorização das rotas REST.
+- `src/models`: schemas e índices do Mongoose.
+- `src/graphql/typeDefs`: tipos, inputs, queries e mutations GraphQL.
+- `src/graphql/resolvers`: consultas, alterações e autorização do domínio pedagógico.
+- `src/services`: montagem dos prompts e chamada tardia da OpenAI.
+- `src/utils`: tratamento comum de erros REST.
+
+## REST e GraphQL
+
+O projeto usa REST para autenticação e administração de usuários. Turmas, alunos, matrículas, aulas, registros e feedbacks ficam no endpoint GraphQL.
+
+| Método | Endereço | Uso |
+| --- | --- | --- |
+| POST | `/auth/register` | Cadastro público de professor |
+| POST | `/auth/login` | Login e emissão do token |
+| GET | `/admin/usuarios` | Listagem de usuários por administrador |
+| PATCH | `/admin/usuarios/:id/status` | Ativação ou inativação de usuário |
+| POST | `/graphql` | Domínio pedagógico |
+
+A rota de cadastro implementada no código é `/auth/register`. As rotas administrativas exigem Bearer token de um usuário com perfil `admin`.
+
+## Configuração
+
+As variáveis usadas pela aplicação estão listadas em `.env.example`:
+
+| Variável | Uso |
+| --- | --- |
+| `MONGODB_URI` | Conexão com o MongoDB |
+| `PORT` | Porta HTTP do servidor |
+| `JWT_SECRET` | Assinatura dos tokens JWT |
+| `OPENAI_API_KEY` | Credencial usada apenas nas gerações solicitadas |
+| `OPENAI_MODEL` | Modelo usado pelo serviço de IA |
+
+A falta das variáveis da OpenAI não impede o servidor de iniciar, mas uma solicitação de geração retorna `IA_NOT_CONFIGURED`. A aplicação conecta ao MongoDB antes de abrir a porta HTTP.
+
 ```bash
 npm install
-```
-
-### 3. Configurar variáveis de ambiente
-Copie `.env.example` para `.env` e preencha:
-```
-MONGODB_URI=mongodb+srv://usuario:senha@cluster0.xxxxx.mongodb.net/devclass?appName=Cluster0
-PORT=3000
-JWT_SECRET=uma-string-longa-e-aleatoria
-OPENAI_API_KEY=
-OPENAI_MODEL=
-```
-> `OPENAI_API_KEY` e `OPENAI_MODEL` só são usados a partir da Fase 5. Podem ficar vazios até lá.
-
-**Nunca** commite o `.env` — ele já está no `.gitignore`.
-
-### 4. Rodar o servidor
-```bash
 npm start
 ```
-Se tudo estiver certo, aparece no terminal:
-```
-[database] MongoDB conectado com sucesso.
-[server] Rodando em http://localhost:3000
-[server] GraphQL disponível em http://localhost:3000/graphql
-```
-O servidor **não sobe** se o MongoDB falhar ao conectar (comportamento intencional, exigido pela especificação).
 
-### 5. Criar a primeira conta admin
-Não existe endpoint público para criar admin (regra de segurança da spec). Passos:
-1. Cadastre um usuário normal em `POST /auth/register` (ele nasce como `professor`).
-2. No MongoDB Atlas → Browse Collections → banco `devclass` → coleção `usuarios`, edite o campo `perfil` desse documento para `"admin"`.
-3. Faça login novamente com esse usuário — o novo token virá com `perfil: "admin"`.
+Durante o desenvolvimento também pode ser usado:
 
-## Estado atual (Fase 1 concluída)
-
-Implementado por Walter Luan — base, autenticação e segurança.
-
-### Rotas REST
-| Método | Rota | Acesso | Descrição |
-|---|---|---|---|
-| POST | `/auth/register` | Público | Cadastra professor (perfil sempre `professor`) |
-| POST | `/auth/login` | Público | Autentica e retorna JWT |
-| GET | `/admin/usuarios` | Admin | Lista usuários (aceita filtros `?perfil=` e `?ativo=`) |
-| PATCH | `/admin/usuarios/:id/status` | Admin | Ativa/inativa um usuário (`{ "ativo": boolean }`) |
-
-### GraphQL
-- Endpoint único: `POST /graphql`
-- Query `health` disponível para teste de contexto/autenticação.
-- `context.usuario` é populado a partir do Bearer Token e disponível para todos os resolvers futuros — nunca confiar em `professorId`/`usuarioId` vindo do cliente.
-
-### Regras de segurança já implementadas
-- Senha nunca é devolvida em nenhuma resposta (hash com bcrypt, campo com `select: false`).
-- Login usa mensagem genérica (`"Email ou senha inválidos."`) tanto para email inexistente quanto senha errada quanto usuário inativo — não revela qual foi o motivo.
-- `autenticar` (middleware REST) e o `contexto` (GraphQL) sempre confirmam no banco que o usuário **ainda está ativo**, mesmo que o JWT em si continue válido.
-- `autorizar('admin')` bloqueia com 403 qualquer perfil fora da lista permitida.
-- Nenhuma exclusão física: usuários são inativados (`ativo: false`), nunca deletados.
-
-### Testado no Postman (collection `DevClass Backend.postman_collection.json`)
-- Cadastro (201) e email duplicado (409)
-- Login correto (200) e senha errada (401)
-- Acesso sem token (401)
-- Professor tentando rota de admin (403)
-- Admin acessando rota de admin (200)
-- Desativação de usuário e bloqueio de login/token subsequente (401)
-- Query `health` no GraphQL, com e sem autenticação
-
-## Handoff — para o João (Fase 2: Turmas e períodos letivos)
-
-O que você recebe pronto:
-- `src/graphql/schema.js` já expõe `typeDefs`, `resolvers` e `contexto`. Para adicionar o módulo de Turma, importe seus próprios `typeDefs`/`resolvers` em arquivos separados dentro de `src/graphql/typeDefs/` e `src/graphql/resolvers/`, e mescle-os no `schema.js` (por exemplo com `mergeTypeDefs`/`mergeResolvers` do `@graphql-tools/merge`, ou concatenando os objetos manualmente). **Não remova a Query `health`.**
-- Em qualquer resolver autenticado, o usuário logado está disponível em `context.usuario` (campos: `id`, `email`, `perfil`). Use `context.usuario.id` como `professorId` ao criar/consultar Turmas — nunca aceite esse valor vindo do `input` do cliente.
-- Se `context.usuario` for `null`, significa que não havia token válido — trate isso lançando um erro `UNAUTHENTICATED` nos seus resolvers antes de acessar o banco.
-
-O que você precisa para testar:
-- Um token de professor válido e ativo. Gere o seu próprio cadastrando um novo usuário via `POST /auth/register` + `POST /auth/login` — não há token fixo no repositório (proibido pela spec).
-- Se precisar de uma conta admin para testes de isolamento, promova manualmente um usuário no Atlas, como descrito acima.
-
-Antes de começar sua fase:
 ```bash
-git checkout main
-git pull
-git checkout -b fase-2-turmas-joao
+npm run dev
 ```
 
----
+## Regras principais
 
-# Fase 2 — Turmas e períodos letivos
+- A identidade do professor vem do token; os inputs pedagógicos não escolhem o proprietário dos dados.
+- Recursos de outro professor não são expostos pelas operações protegidas.
+- Alunos e usuários mudam de status, enquanto aulas, registros e feedbacks são arquivados. Não há operação de exclusão física no domínio.
+- Para criar ou restaurar um registro ativo, turma, aula e matrícula precisam estar ativas e pertencer ao mesmo contexto.
+- Uma turma não pode ter duas aulas ativas na mesma data.
+- Uma matrícula não pode ter dois registros ativos na mesma aula.
+- Datas de aula usam `AAAA-MM-DD` e precisam pertencer ao período letivo da turma.
+- A IA é chamada somente nas mutations solicitadas pelo professor.
+- Uma mensagem diária exige a estrutura operacional ativa.
+- Feedbacks podem ser `parcial` ou `final` e continuam disponíveis para trabalho histórico mesmo com turma ou matrícula encerrada.
+- Um feedback enviado não pode ser editado ou regenerado até que o envio seja desmarcado.
+- O contato do responsável não é incluído nos dados enviados ao serviço de IA.
 
-**Responsável:** João Vitor Vicente
-**Arquivos:** `src/models/Turma.js`, `src/graphql/typeDefs/turmaTypeDefs.js`, `src/graphql/resolvers/turmaResolvers.js`
+## Roteiro aprovado de testes
 
-## Operações
+As operações GraphQL usam estes headers:
 
-| Tipo | Operação | Observação |
-| --- | --- | --- |
-| Query | `periodosDisponiveis` | períodos únicos do professor, do mais recente ao mais antigo |
-| Query | `minhasTurmas(periodoLetivo, status)` | sem `status`, retorna só as `ativa`. Aceita `ativa`, `encerrada` ou `todas` |
-| Query | `turma(id)` | só turma do professor autenticado |
-| Mutation | `criarTurma(input)` | `professorId` vem do JWT |
-| Mutation | `atualizarTurma(id, input)` | altera nome, estágio e encontros; não muda período nem proprietário |
-| Mutation | `encerrarTurma(id)` | `status = encerrada`, sem apagar |
-| Mutation | `reativarTurma(id)` | `status = ativa` |
+```text
+Content-Type: application/json
+Authorization: Bearer <TOKEN>
+```
 
-## Validações
+Os valores `<TURMA_ID>`, `<ALUNO_ID>`, `<MATRICULA_ID>`, `<AULA_ID>`, `<REGISTRO_ID>` e `<FEEDBACK_ID>` vêm das respostas anteriores. O login fornece o `<TOKEN>`.
 
-* `periodoLetivo`: `AAAA.1` ou `AAAA.2`.
-* `encontros`: **pelo menos um**, cada um com `diaSemana` e `horario`.
-* `diaSemana`: `segunda`, `terca`, `quarta`, `quinta`, `sexta`, `sabado`, `domingo` (minúsculas, seção 8 da especificação).
-* `horario`: `HH:mm` entre `00:00` e `23:59`.
+### 1. Login
 
-## Correções aplicadas na integração da Fase 3
+- Método e endereço: `POST {{baseUrl}}/auth/login`
+- Bearer token: Não
 
-Ao integrar a Fase 3 foram encontrados e corrigidos quatro problemas na Fase 2:
-
-1. **A Fase 2 não estava integrada ao schema.** O `src/graphql/schema.js` continuava na versão da Fase 1, com apenas `type Query { health }`. Os arquivos de Turma existiam, mas nada os importava — nenhuma operação de turma existia em tempo de execução. Corrigido no `schema.js`.
-2. **`encontros` aceitava lista vazia**, contrariando a seção 7.2 ("obrigatório, um ou mais objetos"). Agora é exigido pelo menos um encontro, tanto no Model quanto no resolver.
-3. **`minhasTurmas(status)` não validava o valor recebido**: um status inválido devolvia lista vazia em silêncio. Agora devolve erro claro.
-4. **Erros não usavam `extensions.code`** da seção 11.8 — tudo virava `INTERNAL_SERVER_ERROR`. Agora usam `UNAUTHENTICATED`, `BAD_USER_INPUT` e `NOT_FOUND`, igual à Fase 3.
-
-`encerrarTurma` e `reativarTurma` salvam com `validateModifiedOnly: true`, porque só alteram `status`. Sem isso, turmas criadas antes da regra do item 2 não poderiam mais ser encerradas.
-
----
-
-# Fase 3 — Alunos, responsáveis e matrículas
-
-**Responsável:** Ramon Trindade
-**Arquivos:** `src/models/Aluno.js`, `src/models/Matricula.js`, `src/graphql/typeDefs/alunoTypeDefs.js`, `src/graphql/typeDefs/matriculaTypeDefs.js`, `src/graphql/resolvers/alunoResolvers.js`, `src/graphql/resolvers/matriculaResolvers.js`
-
-## Models
-
-### Aluno
-
-| Campo | Tipo | Obrigatório | Regra |
-| --- | --- | --- | --- |
-| `nome` | String | sim | trim; não pode ser vazio |
-| `generoGramatical` | Enum | sim | `masculino` \| `feminino` \| `neutro` |
-| `nomeResponsavel` | String | não | trim |
-| `generoResponsavel` | Enum | condicional | `masculino` \| `feminino` \| `neutro` |
-| `contatoResponsavel` | String | não | dado humano; **nunca enviado à IA** |
-| `professorId` | ObjectId | sim | referência a `Usuario`; sempre do JWT |
-| `status` | Enum | sim | `ativo` \| `inativo`; padrão `ativo` |
-
-### Matricula
-
-| Campo | Tipo | Obrigatório | Regra |
-| --- | --- | --- | --- |
-| `alunoId` | ObjectId | sim | `Aluno` do mesmo professor |
-| `turmaId` | ObjectId | sim | `Turma` do mesmo professor |
-| `periodoLetivo` | String | sim | **copiado da turma** |
-| `status` | Enum | sim | `ativa` \| `encerrada`; padrão `ativa` |
-
-Índice único composto: `matriculaSchema.index({ alunoId: 1, periodoLetivo: 1 }, { unique: true })`.
-
-Ambos usam `timestamps: true`.
-
-## Operações
-
-| Tipo | Operação |
-| --- | --- |
-| Query | `aluno(id)` — inclui `matriculas` quando solicitado |
-| Query | `alunosDaTurma(turmaId, status)` — padrão `ativa`; aceita `ativa`, `encerrada`, `todas` |
-| Mutation | `criarAluno(input)` |
-| Mutation | `atualizarAluno(id, input)` |
-| Mutation | `inativarAluno(id)` / `reativarAluno(id)` |
-| Mutation | `matricularAluno(alunoId, turmaId)` |
-| Mutation | `encerrarMatricula(id)` |
-
-Nenhum input aceita `professorId`, `status` ou `periodoLetivo`.
-
-## Exemplos
-
-```graphql
-mutation {
-  criarAluno(input: { nome: "Ana Souza", generoGramatical: "feminino" }) {
-    id
-    status
-  }
+```json
+{
+  "email": "professor.demo@example.com",
+  "senha": "123456"
 }
 ```
 
-```graphql
-mutation {
-  matricularAluno(alunoId: "ID_DO_ALUNO", turmaId: "ID_DA_TURMA") {
-    id
-    periodoLetivo
-    status
-  }
-}
-```
+Guardar: `token`.
 
-```graphql
-query {
-  aluno(id: "ID_DO_ALUNO") {
-    nome
-    status
-    matriculas {
-      id
-      periodoLetivo
-      status
-      turma { nome }
+Resultado principal: HTTP 200 e token retornado.
+
+### 2. Criar turma
+
+- Método e endereço: `POST {{baseUrl}}/graphql`
+- Bearer token: Sim
+
+```json
+{
+  "query": "mutation ($input: TurmaInput!) { criarTurma(input: $input) { id nome estagio periodoLetivo status } }",
+  "variables": {
+    "input": {
+      "nome": "Turma Apresentação",
+      "estagio": "A2",
+      "periodoLetivo": "2026.2",
+      "encontros": [
+        {
+          "diaSemana": "segunda",
+          "horario": "14:00"
+        }
+      ]
     }
   }
 }
 ```
 
-## Regra do responsável
+Guardar: `data.criarTurma.id` como `<TURMA_ID>`.
 
-O aluno pode existir sem responsável. Se `generoResponsavel` ou `contatoResponsavel` forem informados, `nomeResponsavel` passa a ser obrigatório. A regra é validada no resolver e novamente no `pre('validate')` do Model. Em `atualizarAluno`, a validação roda sobre o **estado final** do documento — não dá para deixar o aluno incoerente limpando só o nome.
+Resultado principal: HTTP 200, `status: "ativa"` e ausência de `errors`.
 
-## Regras de matrícula e rematrícula
+### 3. Criar aluno
 
-* O `periodoLetivo` é sempre copiado da turma.
-* Um aluno só pode ter **uma matrícula por período letivo**. Conflito devolve erro claro com código `CONFLICT`, sem expor o `E11000` do MongoDB.
-* **Rematrícula:** o mesmo aluno pode ser matriculado em turma de outro semestre; o histórico é preservado.
-* Não é possível matricular aluno `inativo` nem em turma `encerrada`.
-* Encerrar matrícula muda o `status` e **não** apaga o documento. Como o índice único considera `alunoId + periodoLetivo` independente do status, encerrar não libera o aluno para outra turma no mesmo semestre — é intencional.
+- Método e endereço: `POST {{baseUrl}}/graphql`
+- Bearer token: Sim
 
-## Segurança
+```json
+{
+  "query": "mutation ($input: CriarAlunoInput!) { criarAluno(input: $input) { id nome generoGramatical nomeResponsavel generoResponsavel contatoResponsavel status } }",
+  "variables": {
+    "input": {
+      "nome": "Ana Apresentação",
+      "generoGramatical": "feminino",
+      "nomeResponsavel": "Marina",
+      "generoResponsavel": "feminino",
+      "contatoResponsavel": "marina@example.com"
+    }
+  }
+}
+```
 
-* Todas as operações exigem `context.usuario`.
-* `professorId` vem exclusivamente de `context.usuario.id`.
-* Recurso de outro professor devolve sempre a mesma mensagem com código `NOT_FOUND`, para não revelar a existência de documento alheio (regra 13.3 §137).
-* Nenhuma exclusão física: sem `delete`, `findByIdAndDelete`, `deleteOne` ou `deleteMany`.
+Guardar: `data.criarAluno.id` como `<ALUNO_ID>`.
 
-## Códigos de erro (seção 11.8)
+Resultado principal: HTTP 200, `status: "ativo"` e ausência de `errors`.
 
-| Código | Quando |
-| --- | --- |
-| `UNAUTHENTICATED` | sem token válido |
-| `BAD_USER_INPUT` | enum, ID ou responsável incoerente |
-| `NOT_FOUND` | recurso inexistente ou de outro professor |
-| `CONFLICT` | matrícula duplicada no mesmo período |
+### 4. Matricular aluno
 
-## Testes
+- Método e endereço: `POST {{baseUrl}}/graphql`
+- Bearer token: Sim
 
-A collection tem a pasta `04 - Alunos e matrículas` com 20 requisições na ordem de execução, com testes automáticos que gravam `alunoId`, `alunoId2`, `matriculaId` e `matriculaId2` nas variáveis.
+```json
+{
+  "query": "mutation ($alunoId: ID!, $turmaId: ID!) { matricularAluno(alunoId: $alunoId, turmaId: $turmaId) { id alunoId turmaId status } }",
+  "variables": {
+    "alunoId": "<ALUNO_ID>",
+    "turmaId": "<TURMA_ID>"
+  }
+}
+```
 
-Preencha antes: `baseUrl`, `professorToken`, `professorTokenB`, `turmaId`, `turmaIdMesmoPeriodo` (outra turma do **mesmo** período), `turmaIdOutroSemestre` e `turmaIdProfessorB`.
+Guardar: `data.matricularAluno.id` como `<MATRICULA_ID>`.
 
-## Pendências registradas
+Resultado principal: HTTP 200, `status: "ativa"` e ausência de `errors`.
 
-* **Índice único sem filtro de status.** Se o grupo quiser permitir troca de turma dentro do mesmo semestre, será preciso um índice parcial (`partialFilterExpression: { status: 'ativa' }`) — é mudança de regra e exige atualizar a especificação antes.
-* **`alunosDaTurma` filtra por status da matrícula, não do aluno.** Um aluno `inativo` com matrícula `ativa` ainda aparece. A regra 17.1 §160 sugere ocultar inativos na visão padrão; o plano pede "liste alunos por matrícula ativa da turma". Pendente de decisão do grupo.
-* **`atualizarTurma` (Fase 2) exige `periodoLetivo` no input mas ignora o valor.** Corrigir exigiria um `AtualizarTurmaInput` separado, mudando o contrato que o Postman da Fase 2 já usa. Não alterado.
+### 5. Criar aula
+
+- Método e endereço: `POST {{baseUrl}}/graphql`
+- Bearer token: Sim
+
+```json
+{
+  "query": "mutation ($input: CriarAulaInput!) { criarAula(input: $input) { id turmaId data topicos status } }",
+  "variables": {
+    "input": {
+      "turmaId": "<TURMA_ID>",
+      "data": "2026-09-08",
+      "topicos": [
+        "Present perfect",
+        "Experiências pessoais"
+      ]
+    }
+  }
+}
+```
+
+Guardar: `data.criarAula.id` como `<AULA_ID>`.
+
+Resultado principal: HTTP 200, `status: "ativa"` e ausência de `errors`.
+
+### 6. Adicionar registro diário
+
+- Método e endereço: `POST {{baseUrl}}/graphql`
+- Bearer token: Sim
+
+```json
+{
+  "query": "mutation ($input: CriarRegistroInput!) { adicionarRegistro(input: $input) { id aulaId matriculaId observacaoGeral avaliacoes { habilidade desempenho observacao } status } }",
+  "variables": {
+    "input": {
+      "aulaId": "<AULA_ID>",
+      "matriculaId": "<MATRICULA_ID>",
+      "observacaoGeral": "Participou bem das atividades em dupla.",
+      "avaliacoes": [
+        {
+          "habilidade": "speaking",
+          "desempenho": "destaque",
+          "observacao": "Falou com confiança e utilizou o conteúdo da aula."
+        },
+        {
+          "habilidade": "listening",
+          "desempenho": "precisa_de_atencao",
+          "observacao": "Precisou ouvir algumas instruções novamente."
+        }
+      ]
+    }
+  }
+}
+```
+
+Guardar: `data.adicionarRegistro.id` como `<REGISTRO_ID>`.
+
+Resultado principal: HTTP 200, duas avaliações, `status: "ativo"` e ausência de `errors`.
+
+### 7. Gerar mensagem diária com IA
+
+- Método e endereço: `POST {{baseUrl}}/graphql`
+- Bearer token: Sim
+
+```json
+{
+  "query": "mutation ($id: ID!) { gerarMensagemDiaria(id: $id) { id mensagemIAOriginal mensagemEditada geradaEm status } }",
+  "variables": {
+    "id": "<REGISTRO_ID>"
+  }
+}
+```
+
+Resultado principal: HTTP 200, textos original e editável preenchidos e ausência de `errors`.
+
+### 8. Editar mensagem diária
+
+- Método e endereço: `POST {{baseUrl}}/graphql`
+- Bearer token: Sim
+
+```json
+{
+  "query": "mutation ($id: ID!, $texto: String!) { editarMensagemDiaria(id: $id, texto: $texto) { id mensagemIAOriginal mensagemEditada geradaEm status } }",
+  "variables": {
+    "id": "<REGISTRO_ID>",
+    "texto": "Mensagem revisada pelo professor."
+  }
+}
+```
+
+Resultado principal: HTTP 200, texto original preservado e `mensagemEditada` atualizada.
+
+### 9. Gerar feedback parcial com IA
+
+- Método e endereço: `POST {{baseUrl}}/graphql`
+- Bearer token: Sim
+
+```json
+{
+  "query": "mutation ($input: GerarFeedbacksInput!) { gerarFeedbacks(input: $input) { id matriculaId tipo textoIAOriginal textoEditado geradoPorIA geradoEm statusEnvio enviadoEm status } }",
+  "variables": {
+    "input": {
+      "matriculaIds": [
+        "<MATRICULA_ID>"
+      ],
+      "tipo": "parcial"
+    }
+  }
+}
+```
+
+Guardar: `data.gerarFeedbacks[0].id` como `<FEEDBACK_ID>`.
+
+Resultado principal: HTTP 200, `geradoPorIA: true`, `statusEnvio: "rascunho"` e `status: "ativo"`.
+
+### 10. Listar feedbacks
+
+- Método e endereço: `POST {{baseUrl}}/graphql`
+- Bearer token: Sim
+
+```json
+{
+  "query": "query ($matriculaId: ID!) { feedbacks(matriculaId: $matriculaId, status: \"ativo\") { id matriculaId tipo textoEditado geradoPorIA statusEnvio status } }",
+  "variables": {
+    "matriculaId": "<MATRICULA_ID>"
+  }
+}
+```
+
+Resultado principal: HTTP 200 e feedback parcial presente em `data.feedbacks`.
+
+### 11. Editar feedback
+
+- Método e endereço: `POST {{baseUrl}}/graphql`
+- Bearer token: Sim
+
+```json
+{
+  "query": "mutation ($id: ID!, $texto: String!) { editarFeedback(id: $id, texto: $texto) { id textoIAOriginal textoEditado statusEnvio status } }",
+  "variables": {
+    "id": "<FEEDBACK_ID>",
+    "texto": "Feedback revisado e aprovado pelo professor."
+  }
+}
+```
+
+Resultado principal: HTTP 200, `textoEditado` atualizado e texto original preservado.
+
+### 12. Confirmar envio do feedback
+
+- Método e endereço: `POST {{baseUrl}}/graphql`
+- Bearer token: Sim
+
+```json
+{
+  "query": "mutation ($id: ID!) { marcarFeedbackEnviado(id: $id) { id textoEditado statusEnvio enviadoEm status } }",
+  "variables": {
+    "id": "<FEEDBACK_ID>"
+  }
+}
+```
+
+Resultado principal: HTTP 200, `statusEnvio: "enviado"` e `enviadoEm` preenchido.
+
+### 13. Demonstrar o bloqueio de edição após o envio
+
+- Método e endereço: `POST {{baseUrl}}/graphql`
+- Bearer token: Sim
+
+```json
+{
+  "query": "mutation ($id: ID!, $texto: String!) { editarFeedback(id: $id, texto: $texto) { id textoEditado statusEnvio } }",
+  "variables": {
+    "id": "<FEEDBACK_ID>",
+    "texto": "Tentativa de alteração."
+  }
+}
+```
+
+Resultado principal: HTTP 200, `data: null`, erro GraphQL com `extensions.code: "CONFLICT"`.
+
+### 14. Arquivar feedback
+
+- Método e endereço: `POST {{baseUrl}}/graphql`
+- Bearer token: Sim
+
+```json
+{
+  "query": "mutation ($id: ID!) { arquivarFeedback(id: $id) { id tipo statusEnvio status } }",
+  "variables": {
+    "id": "<FEEDBACK_ID>"
+  }
+}
+```
+
+Resultado principal: HTTP 200 e `status: "arquivado"`.
+
+### 15. Consultar o histórico
+
+- Método e endereço: `POST {{baseUrl}}/graphql`
+- Bearer token: Sim
+
+```json
+{
+  "query": "query ($matriculaId: ID!) { feedbacks(matriculaId: $matriculaId, status: \"todos\") { id tipo textoEditado statusEnvio enviadoEm status } }",
+  "variables": {
+    "matriculaId": "<MATRICULA_ID>"
+  }
+}
+```
+
+Resultado principal: HTTP 200 e feedback arquivado ainda presente em `data.feedbacks`.
+
+## Limitações
+
+- O projeto não possui frontend.
+- O servidor depende de uma conexão configurada com MongoDB.
+- As gerações dependem de uma chave e de um modelo OpenAI configurados no servidor.
+- Os textos gerados precisam de revisão do professor.
+- O envio ao responsável não é automatizado.
+- Contas administrativas são provisionadas separadamente; o cadastro público sempre cria um professor.
+- O projeto foi desenvolvido para uso acadêmico e demonstração. Não houve validação para implantação em produção.
