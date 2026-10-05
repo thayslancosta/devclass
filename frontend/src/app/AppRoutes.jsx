@@ -8,6 +8,8 @@ import CadastroPage from '../features/auth/CadastroPage';
 import MeusAlunosPage from '../features/alunos/MeusAlunosPage';
 import AlunoPerfilPage from '../features/alunos/AlunoPerfilPage';
 import TurmaAlunosTab from '../features/alunos/TurmaAlunosTab';
+import AulasTab from '../features/aulas/AulasTab';
+import AulaDetalhe from '../features/aulas/AulaDetalhe';
 import TurmasPage from '../features/turmas/TurmasPage';
 import TurmaPage, { TurmaTabPlaceholder } from '../features/turmas/TurmaPage';
 import AdminUsersPage from '../features/admin/AdminUsersPage';
@@ -29,10 +31,8 @@ export default function AppRoutes() {
         <Route path="/turmas/:turmaId" element={<TurmaPage />}>
           <Route index element={<Navigate to="alunos" replace />} />
           <Route path="alunos" element={<TurmaAlunosTab />} />
-          <Route
-            path="aulas"
-            element={<TurmaTabPlaceholder titulo="Aulas da turma" descricao="O planejamento e o histórico de aulas serão integrados na Fase 4." />}
-          />
+          <Route path="aulas" element={<AulasTab />} />
+          <Route path="aulas/:aulaId" element={<AulaDetalhe />} />
           <Route
             path="feedbacks"
             element={<TurmaTabPlaceholder titulo="Feedbacks da turma" descricao="Os feedbacks do semestre serão integrados na Fase 5." />}
