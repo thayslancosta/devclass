@@ -66,9 +66,38 @@ Vite). Nenhum valor de credencial listado aqui.
 
 ## Fase 3 — Ramon Trindade (alunos, responsáveis, matrículas)
 
-_(preencher ao concluir a fase)_
+**Versão:** branch `frontend-fase-3-ramon`, ainda sem commit.
 
----
+**Ambiente:** Node 26.3.0 e npm 11.16.0. Backend real iniciado na raiz (porta 3000) e frontend em `frontend/` (Vite 5.4.21, porta 5173, via proxy). Para os testes manuais abaixo, o backend foi apontado para um MongoDB local e vazio (`devclass_fase3_ramon`), sem gravar dados no banco compartilhado do grupo. Nenhum valor de credencial listado.
+
+**Implementado:** Meus alunos com busca e filtros locais; cadastro e edição com responsável opcional; inativar e reativar cadastro; aba Alunos da turma com filtro de matrícula; matricular aluno existente com atalho para cadastrar e voltar à seleção; encerrar matrícula; perfil do aluno com matrículas históricas e ponto de integração para registros e feedbacks.
+
+**Verificações automatizadas:** `npm --prefix frontend run lint` e `npm --prefix frontend run build` passaram; `git diff --check` passou.
+
+**Fluxos manuais executados em 05/10/2026 com MongoDB local:**
+- [x] Entrar como professor, criar turma ativa e abrir a aba Alunos.
+- [x] Criar aluno sem responsável e encontrá-lo em Meus alunos.
+- [x] Criar aluno com responsável, editar e depois remover o responsável; confirmar que nome, gênero e contato ficam vazios.
+- [x] Ver aluno sem matrícula no filtro "Sem matrícula neste semestre".
+- [x] Matricular aluno em turma ativa; conferir a aba da turma e o período da matrícula.
+- [x] Encerrar a matrícula de um aluno de teste; conferir "Ativas", "Encerradas" e o perfil.
+- [x] Consultar aluno inativo e reativar.
+- [x] Recarregar `/alunos/:alunoId` e confirmar que o perfil carrega pela URL.
+- [x] Tentar nova matrícula no mesmo semestre e confirmar que o aluno não aparece entre os disponíveis de outra turma.
+- [x] Matricular o mesmo cadastro em uma turma de semestre posterior, sem duplicar o aluno.
+- [x] Trocar a matrícula histórica selecionada no perfil.
+- [x] Conferir Meus alunos, aba da turma e perfil em viewport estreito/celular.
+
+**Fluxos ainda pendentes no ambiente da apresentação:**
+- [ ] Repetir os fluxos principais usando o banco compartilhado do grupo/Atlas.
+
+**Resultado manual:** executado parcialmente em 05/10/2026 com MongoDB local; os fluxos marcados passaram. Ainda pendente repetir no banco do grupo/ambiente da apresentação.
+
+**Pendências:**
+- Passagem para a Fase 4: criar, na conta de demonstração do grupo, uma turma ativa com ao menos dois alunos matriculados. As matrículas do percurso da apresentação não devem ser encerradas, porque não podem ser refeitas no mesmo semestre.
+- As seções de registros e feedbacks do perfil são provisórias até as Fases 4 e 5 (`PerfilHistorico.jsx`).
+- Criar turma em um semestre que ainda não tem turmas pode depender de abrir `/turmas?periodo=AAAA.S` pela URL, pois o seletor de semestre lista apenas o atual e os já cadastrados. Tela da Fase 2, não alterada.
+- Abrir ou recarregar `/admin/usuarios` diretamente no navegador pode devolver a resposta JSON do backend, porque o proxy do Vite encaminha caminhos iniciados em `/admin`. Configuração da Fase 1, não alterada.
 
 ## Fase 4 — Pedro Henrique (aulas, registros, mensagem diária)
 

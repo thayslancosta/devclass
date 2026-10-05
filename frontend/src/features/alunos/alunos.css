@@ -1,0 +1,218 @@
+.pagina-alunos,
+.pagina-aluno,
+.turma-alunos { width: 100%; }
+
+.pagina-alunos__topo,
+.pagina-aluno__topo,
+.turma-alunos__topo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--espaco-3);
+  margin-bottom: var(--espaco-3);
+}
+.pagina-alunos__topo h1,
+.pagina-aluno__topo h1,
+.turma-alunos__topo h2 { margin-bottom: var(--espaco-1); }
+.turma-alunos__topo h2 { font-size: 18px; }
+.pagina-aluno__acoes { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--espaco-2); }
+
+.alunos-sobretitulo { color: var(--cor-texto-secundario); font-size: 13px; margin: 0 0 var(--espaco-1); }
+.alunos-secundario { color: var(--cor-texto-secundario); font-size: 14px; margin: var(--espaco-1) 0; }
+.alunos-voltar { display: inline-block; margin-bottom: var(--espaco-3); text-decoration: none; }
+.alunos-contagem { margin-bottom: var(--espaco-2); }
+
+/* ---------- Mensagens ---------- */
+.alunos-sucesso {
+  margin: 0 0 var(--espaco-3);
+  padding: var(--espaco-2) var(--espaco-3);
+  border-radius: var(--raio-borda);
+  color: var(--cor-sucesso);
+  background: #f1faf3;
+  font-size: 14px;
+}
+.alunos-aviso {
+  margin: 0 0 var(--espaco-3);
+  padding: var(--espaco-2) var(--espaco-3);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-borda);
+  background: var(--cor-sidebar);
+  font-size: 14px;
+}
+.alunos-erro { margin-bottom: var(--espaco-3); }
+.alunos-erro .mensagem-erro { margin-bottom: var(--espaco-2); }
+
+/* ---------- Situações: o texto do rótulo sempre diz o que é ---------- */
+.alunos-pill--ativo,
+.alunos-pill--ativa { color: var(--cor-sucesso); border-color: #abd5b7; background: #f1faf3; }
+.alunos-pill--inativo,
+.alunos-pill--encerrada { background: var(--cor-sidebar); }
+
+/* ---------- Filtros ---------- */
+.alunos-filtros {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 0 var(--espaco-3);
+  margin-top: var(--espaco-3);
+}
+.alunos-filtros .campo { min-width: 0; margin-bottom: var(--espaco-2); }
+.alunos-filtros .campo__input { width: 100%; }
+.alunos-filtros .campo__input:disabled { background: var(--cor-sidebar); color: var(--cor-texto-secundario); }
+.alunos-filtros__nota { font-size: 13px; margin: 0 0 var(--espaco-3); }
+
+.turma-alunos__filtro {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--espaco-3);
+  margin-bottom: var(--espaco-3);
+}
+.turma-alunos__filtro .campo { min-width: 190px; margin-bottom: 0; }
+.turma-alunos__filtro .alunos-secundario { flex: 1; margin: 0; font-size: 13px; }
+
+/* ---------- Listas ---------- */
+.alunos-lista { list-style: none; margin: 0; padding: 0; }
+.alunos-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco-3);
+  border: 1px solid var(--cor-borda);
+  border-radius: 12px;
+  padding: var(--espaco-3);
+  margin-bottom: var(--espaco-2);
+  background: #fff;
+}
+.alunos-item__principal { min-width: 0; }
+.alunos-item__titulo { display: flex; flex-wrap: wrap; align-items: center; gap: var(--espaco-2); }
+.alunos-item__titulo h1 { margin: 0; }
+.alunos-item__nome { font-weight: 600; font-size: 16px; color: var(--cor-texto); text-decoration: none; overflow-wrap: anywhere; }
+.alunos-item__nome:hover { color: var(--cor-acao); text-decoration: underline; }
+.alunos-item__acoes { display: flex; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; gap: var(--espaco-2); }
+.alunos-item .botao,
+.pagina-aluno .botao { text-decoration: none; }
+
+/* ---------- Formulário e seleção em modal ---------- */
+.aluno-modal-overlay {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  padding: var(--espaco-3);
+  background: rgba(25, 31, 38, 0.45);
+}
+.aluno-modal {
+  width: min(560px, 100%);
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  padding: var(--espaco-4);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.18);
+}
+.aluno-modal h2 { margin-bottom: var(--espaco-2); }
+.aluno-modal form { margin-top: var(--espaco-3); }
+.aluno-form__ajuda { color: var(--cor-texto-secundario); font-size: 13px; margin: calc(-1 * var(--espaco-2)) 0 var(--espaco-3); }
+.aluno-form__responsavel {
+  min-width: 0;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-borda);
+  padding: var(--espaco-3);
+  margin: 0 0 var(--espaco-3);
+}
+.aluno-form__responsavel legend { padding: 0 var(--espaco-1); font-size: 13px; font-weight: 600; }
+.aluno-form__responsavel .aluno-form__ajuda { margin: var(--espaco-2) 0 0; }
+.aluno-form__linha { display: grid; grid-template-columns: 1fr 1fr; gap: 0 var(--espaco-3); }
+.aluno-form__linha .campo { min-width: 0; }
+.aluno-form__acoes { display: flex; justify-content: flex-end; gap: var(--espaco-2); margin-top: var(--espaco-3); }
+
+.matricular-lista {
+  min-width: 0;
+  max-height: 260px;
+  overflow-y: auto;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-borda);
+  padding: var(--espaco-2);
+  margin: 0 0 var(--espaco-3);
+}
+.matricular-lista legend { padding: 0 var(--espaco-1); font-size: 13px; font-weight: 600; }
+.matricular-opcao {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--espaco-2);
+  padding: var(--espaco-2);
+  border-radius: var(--raio-borda);
+  cursor: pointer;
+}
+.matricular-opcao:hover,
+.matricular-opcao:has(input:checked) { background: var(--cor-sidebar); }
+.matricular-opcao input { margin-top: 3px; }
+.matricular-opcao__nome { display: block; font-weight: 500; overflow-wrap: anywhere; }
+.matricular-opcao .alunos-secundario { display: block; margin: 0; font-size: 13px; }
+.matricular-indisponiveis { margin-bottom: var(--espaco-3); font-size: 13px; color: var(--cor-texto-secundario); }
+.matricular-indisponiveis ul { margin: var(--espaco-1) 0 0; padding-left: 18px; }
+.matricular-novo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco-3);
+  border-top: 1px solid var(--cor-borda);
+  padding-top: var(--espaco-3);
+}
+.matricular-novo .alunos-secundario { margin: 0; font-size: 13px; }
+.matricular-novo .botao { flex-shrink: 0; }
+.matricular-selecao { margin: var(--espaco-3) 0 0; font-size: 14px; font-weight: 500; }
+
+/* ---------- Perfil ---------- */
+.perfil-secao { border-top: 1px solid var(--cor-borda); padding: var(--espaco-4) 0 var(--espaco-2); }
+.perfil-secao h2 { font-size: 18px; margin-bottom: var(--espaco-2); }
+.perfil-dados {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: var(--espaco-3);
+  margin: var(--espaco-3) 0;
+}
+.perfil-dados dt { color: var(--cor-texto-secundario); font-size: 12px; font-weight: 600; margin-bottom: 2px; }
+.perfil-dados dd { margin: 0; font-size: 14px; overflow-wrap: anywhere; }
+.perfil-matriculas { display: flex; flex-wrap: wrap; gap: var(--espaco-2); margin: var(--espaco-3) 0; }
+.perfil-matricula {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--espaco-1);
+  min-width: 180px;
+  padding: var(--espaco-2) var(--espaco-3);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-borda);
+  background: #fff;
+  color: var(--cor-texto);
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+.perfil-matricula:hover { background: var(--cor-sidebar); }
+.perfil-matricula:focus-visible { outline: 2px solid var(--cor-acao); outline-offset: 1px; }
+.perfil-matricula.selecionada { border-color: var(--cor-acao); box-shadow: inset 0 0 0 1px var(--cor-acao); }
+.perfil-matricula__periodo { color: var(--cor-texto-secundario); font-size: 12px; font-weight: 600; }
+.perfil-matricula__turma { font-weight: 600; overflow-wrap: anywhere; }
+.perfil-historico__secao { margin-top: var(--espaco-3); }
+.perfil-historico__secao h3 { font-size: 15px; margin-bottom: var(--espaco-2); }
+
+@media (max-width: 620px) {
+  .pagina-alunos__topo,
+  .pagina-aluno__topo,
+  .turma-alunos__topo,
+  .alunos-item,
+  .turma-alunos__filtro,
+  .matricular-novo { align-items: stretch; flex-direction: column; }
+  .alunos-item__acoes,
+  .pagina-aluno__acoes { justify-content: flex-start; }
+  .alunos-filtros { grid-template-columns: 1fr 1fr; gap: 0 var(--espaco-2); }
+  .alunos-filtros .campo:first-child { grid-column: 1 / -1; }
+  .turma-alunos__filtro .campo { min-width: 0; }
+  .aluno-modal { padding: var(--espaco-3); }
+  .aluno-form__linha { grid-template-columns: 1fr; }
+  .perfil-matricula { min-width: 0; flex: 1 1 100%; }
+}
