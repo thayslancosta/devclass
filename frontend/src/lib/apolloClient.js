@@ -1,4 +1,5 @@
 import { ApolloClient, InMemoryCache, HttpLink, ApolloLink } from '@apollo/client';
+import { map } from 'rxjs';
 
 const GRAPHQL_URL = import.meta.env.VITE_GRAPHQL_URL || '/graphql';
 
@@ -17,7 +18,7 @@ function obterTokenAtual() {
 
 // Callback central: quando qualquer consulta/mutation GraphQL falhar com
 // UNAUTHENTICATED, dispara um evento que o AuthContext escuta para encerrar
-// a sessão. Mantido como link simples para não depender de pacotes extras.
+// a sessão. O resultado do link usa o operador map do RxJS.
 const authLink = new ApolloLink((operation, forward) => {
   const token = obterTokenAtual();
   operation.setContext(({ headers = {} }) => ({
@@ -30,7 +31,7 @@ const authLink = new ApolloLink((operation, forward) => {
 });
 
 const errorLink = new ApolloLink((operation, forward) => {
-  return forward(operation).map((resultado) => {
+  return forward(operation).pipe(map((resultado) => {
     const semAutenticacao = resultado.errors?.some(
       (erro) => erro.extensions?.code === 'UNAUTHENTICATED'
     );
@@ -38,7 +39,7 @@ const errorLink = new ApolloLink((operation, forward) => {
       window.dispatchEvent(new CustomEvent('devclass:sessao-invalida'));
     }
     return resultado;
-  });
+  }));
 });
 
 const httpLink = new HttpLink({ uri: GRAPHQL_URL });

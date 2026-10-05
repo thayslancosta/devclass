@@ -11,7 +11,7 @@ const MENSAGENS_POR_CODIGO = {
 export function extrairMensagemErro(erro) {
   if (!erro) return 'Ocorreu um erro inesperado.';
 
-  const graphQLErrors = erro.graphQLErrors || [];
+  const graphQLErrors = erro.errors || erro.graphQLErrors || [];
   if (graphQLErrors.length > 0) {
     const primeiro = graphQLErrors[0];
     const codigo = primeiro.extensions?.code;

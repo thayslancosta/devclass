@@ -6,8 +6,9 @@ import AdminLayout from '../components/layout/AdminLayout';
 import LoginPage from '../features/auth/LoginPage';
 import CadastroPage from '../features/auth/CadastroPage';
 import MeusAlunosPage from '../features/alunos/MeusAlunosPage';
-import TurmasPlaceholder from '../features/turmas/TurmasPlaceholder';
-import AdminPlaceholder from '../features/admin/AdminPlaceholder';
+import TurmasPage from '../features/turmas/TurmasPage';
+import TurmaPage, { TurmaTabPlaceholder } from '../features/turmas/TurmaPage';
+import AdminUsersPage from '../features/admin/AdminUsersPage';
 
 export default function AppRoutes() {
   return (
@@ -22,13 +23,22 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       >
-        {/*
-          PROVISÓRIO: /turmas e as rotas aninhadas de turma (/turmas/:turmaId,
-          .../alunos, .../aulas, .../feedbacks) serão criadas pela Fase 2
-          (João), que troca TurmasPlaceholder pelo dashboard real com Outlet
-          para as abas da turma.
-        */}
-        <Route path="/turmas" element={<TurmasPlaceholder />} />
+        <Route path="/turmas" element={<TurmasPage />} />
+        <Route path="/turmas/:turmaId" element={<TurmaPage />}>
+          <Route index element={<Navigate to="alunos" replace />} />
+          <Route
+            path="alunos"
+            element={<TurmaTabPlaceholder titulo="Alunos da turma" descricao="A lista de alunos e matrículas será integrada na Fase 3." />}
+          />
+          <Route
+            path="aulas"
+            element={<TurmaTabPlaceholder titulo="Aulas da turma" descricao="O planejamento e o histórico de aulas serão integrados na Fase 4." />}
+          />
+          <Route
+            path="feedbacks"
+            element={<TurmaTabPlaceholder titulo="Feedbacks da turma" descricao="Os feedbacks do semestre serão integrados na Fase 5." />}
+          />
+        </Route>
         <Route path="/alunos" element={<MeusAlunosPage />} />
       </Route>
 
@@ -39,8 +49,7 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       >
-        {/* PROVISÓRIO: substituído pela Fase 2 (João) pela listagem real. */}
-        <Route path="/admin/usuarios" element={<AdminPlaceholder />} />
+        <Route path="/admin/usuarios" element={<AdminUsersPage />} />
       </Route>
 
       <Route path="/" element={<Navigate to="/login" replace />} />
