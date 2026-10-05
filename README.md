@@ -97,6 +97,27 @@ npm run lint
 npm run build
 ```
 
+### Alunos, responsáveis e matrículas (Fase 3)
+
+| Rota | Conteúdo |
+| --- | --- |
+| `/alunos` | Meus alunos: todos os cadastros do professor, com ou sem matrícula |
+| `/alunos/:alunoId` | Perfil: cadastro, matrículas históricas e histórico da matrícula selecionada |
+| `/turmas/:turmaId/alunos` | Aba Alunos da turma: matrículas, matricular aluno existente e encerrar matrícula |
+
+- **Meus alunos** carrega `meusAlunos(status: "todos")` uma vez e filtra na tela: busca por nome, situação do cadastro (inicialmente ativos), semestre, turma e matrícula no semestre. "Sem matrícula neste semestre" significa não ter nenhuma matrícula no período, nem mesmo encerrada.
+- **Cadastro e edição** exigem nome e gênero gramatical, informado pelo professor. O responsável é opcional; gênero ou contato do responsável exigem o nome. Remover o responsável limpa nome, gênero e contato juntos.
+- **Situação do cadastro** (ativo ou inativo) e **situação da matrícula** (ativa ou encerrada) são independentes. Inativar um cadastro não encerra matrículas e preserva o histórico. Na aba da turma, o filtro "Ativas" é a visão operacional e não mostra alunos com cadastro inativo; "Todas" mostra o histórico completo.
+- **Matricular** seleciona um cadastro ativo que ainda não tem matrícula no semestre da turma. Quem não encontrar o aluno pode cadastrá-lo ali mesmo e voltar à seleção.
+- **Encerrar matrícula** é definitivo: o backend não oferece restauração nem transferência, e o aluno não pode ser matriculado de novo no mesmo semestre.
+
+Pontos de integração para as fases seguintes:
+
+- `frontend/src/features/alunos/useAlunosDaTurma.js`: `useAlunosDaTurma(turmaId, status)` devolve `itens` com `{ aluno, matricula }`, já pareando cada aluno com a matrícula daquela turma.
+- `frontend/src/features/alunos/PerfilHistorico.jsx`: recebe `{ aluno, matricula }` da matrícula selecionada no perfil. As seções de registros (Fase 4) e feedbacks (Fase 5) entram nesse arquivo, sem alterar `AlunoPerfilPage.jsx`.
+- A matrícula selecionada no perfil fica na URL (`/alunos/:alunoId?matricula=<id>`). Sem o parâmetro, o perfil seleciona a matrícula do semestre em uso ou, se não houver, a mais recente.
+- `matricula.id` é o identificador usado em `registros(matriculaId)`, `feedbacks(matriculaId)` e `encerrarMatricula(id)`; o ID do aluno não serve para essas operações.
+
 ## Regras principais
 
 - A identidade do professor vem do token; os inputs pedagógicos não escolhem o proprietário dos dados.

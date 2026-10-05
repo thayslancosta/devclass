@@ -6,6 +6,8 @@ import AdminLayout from '../components/layout/AdminLayout';
 import LoginPage from '../features/auth/LoginPage';
 import CadastroPage from '../features/auth/CadastroPage';
 import MeusAlunosPage from '../features/alunos/MeusAlunosPage';
+import AlunoPerfilPage from '../features/alunos/AlunoPerfilPage';
+import TurmaAlunosTab from '../features/alunos/TurmaAlunosTab';
 import TurmasPage from '../features/turmas/TurmasPage';
 import TurmaPage, { TurmaTabPlaceholder } from '../features/turmas/TurmaPage';
 import AdminUsersPage from '../features/admin/AdminUsersPage';
@@ -26,10 +28,7 @@ export default function AppRoutes() {
         <Route path="/turmas" element={<TurmasPage />} />
         <Route path="/turmas/:turmaId" element={<TurmaPage />}>
           <Route index element={<Navigate to="alunos" replace />} />
-          <Route
-            path="alunos"
-            element={<TurmaTabPlaceholder titulo="Alunos da turma" descricao="A lista de alunos e matrículas será integrada na Fase 3." />}
-          />
+          <Route path="alunos" element={<TurmaAlunosTab />} />
           <Route
             path="aulas"
             element={<TurmaTabPlaceholder titulo="Aulas da turma" descricao="O planejamento e o histórico de aulas serão integrados na Fase 4." />}
@@ -40,6 +39,7 @@ export default function AppRoutes() {
           />
         </Route>
         <Route path="/alunos" element={<MeusAlunosPage />} />
+        <Route path="/alunos/:alunoId" element={<AlunoPerfilPage />} />
       </Route>
 
       <Route
