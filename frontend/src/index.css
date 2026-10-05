@@ -283,3 +283,72 @@ input, select, textarea {
   gap: var(--espaco-2);
   margin-top: var(--espaco-3);
 }
+
+/* ---------- Acabamento visual alinhado à identidade da Fase 1 ---------- */
+body {
+  background: #f7f7f5;
+}
+
+.pagina-auth {
+  width: min(100% - 32px, 420px);
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 40px;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 1px solid var(--cor-borda);
+  border-radius: 12px;
+  background: var(--cor-fundo);
+  box-shadow: 0 12px 36px rgba(55, 53, 47, 0.08);
+}
+
+.pagina-auth::before {
+  content: 'DEVCLASS';
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  margin-bottom: 20px;
+  padding: 0 10px;
+  border-radius: 6px;
+  background: #eef4fa;
+  color: var(--cor-acao);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+}
+
+.pagina-auth h1 {
+  margin-bottom: 8px;
+  font-size: 26px;
+  letter-spacing: -0.025em;
+}
+
+.pagina-auth form {
+  margin-top: 24px;
+}
+
+.pagina-auth .botao {
+  width: 100%;
+  min-height: 42px;
+  margin-top: 4px;
+}
+
+.pagina-auth > p {
+  color: var(--cor-texto-secundario);
+}
+
+.pagina-auth a {
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.pagina-auth a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 520px) {
+  .pagina-auth {
+    padding: 28px 24px;
+  }
+}
