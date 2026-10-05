@@ -1,0 +1,33 @@
+.aulas { width: 100%; }
+.aulas-topo { display: flex; align-items: end; gap: var(--espaco-3); margin-bottom: var(--espaco-3); }
+.aulas-topo h2 { margin: 0 auto 0 0; font-size: 18px; }
+.aulas-topo .campo { min-width: 170px; margin: 0; }
+.aulas-lista { list-style: none; margin: 0; padding: 0; }
+.aulas-lista li { display: flex; justify-content: space-between; align-items: center; gap: var(--espaco-3); padding: var(--espaco-3) 0; border-bottom: 1px solid var(--cor-borda); }
+.aulas-lista__principal { min-width: 0; }
+.aulas-topicos { color: var(--cor-texto-secundario); font-size: 14px; margin: var(--espaco-1) 0 0; }
+.aulas-acoes { display: flex; align-items: center; flex-wrap: wrap; gap: var(--espaco-2); }
+.aulas-form { display: grid; gap: var(--espaco-3); margin: var(--espaco-3) 0; padding: var(--espaco-3); border: 1px solid var(--cor-borda); border-radius: var(--raio-borda); }
+.aulas-form label, .mensagem-diaria label { display: grid; gap: var(--espaco-1); font-size: 14px; }
+.aulas-form input, .aulas-form textarea, .aulas-form select, .mensagem-diaria textarea { width: 100%; min-height: 40px; padding: var(--espaco-2); border: 1px solid var(--cor-borda); border-radius: var(--raio-borda); color: var(--cor-texto); font: inherit; }
+.aulas-form input:focus-visible, .aulas-form textarea:focus-visible, .aulas-form select:focus-visible, .mensagem-diaria textarea:focus-visible { outline: 2px solid var(--cor-acao); outline-offset: 2px; }
+.aulas-erro { color: var(--cor-perigo); }
+.aulas-ok { color: var(--cor-sucesso); }
+.aulas-aviso { padding: var(--espaco-2) var(--espaco-3); border: 1px solid var(--cor-borda); border-radius: var(--raio-borda); background: var(--cor-sidebar); }
+.tag { display: inline-block; padding: 2px var(--espaco-2); border: 1px solid var(--cor-borda); border-radius: 999px; background: var(--cor-sidebar); font-size: 12px; }
+.tag-ativa, .tag-ativo { color: var(--cor-sucesso); }
+.registro-aluno { margin: var(--espaco-2) 0; border: 1px solid var(--cor-borda); border-radius: var(--raio-borda); }
+.registro-cab { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: var(--espaco-2); padding: var(--espaco-3); border: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.registro-corpo { padding: 0 var(--espaco-3) var(--espaco-3); }
+.avaliacao { display: grid; gap: var(--espaco-2); margin: 0; padding: var(--espaco-3); border: 1px solid var(--cor-borda); border-radius: var(--raio-borda); }
+.mensagem-diaria { display: grid; gap: var(--espaco-2); margin-top: var(--espaco-3); padding-top: var(--espaco-3); border-top: 1px solid var(--cor-borda); }
+.mensagem-diaria h4 { margin: 0; }
+.mensagem-diaria textarea { box-sizing: border-box; }
+.historico-registro { padding: var(--espaco-3) 0; border-bottom: 1px solid var(--cor-borda); }
+.historico-registro h4 { margin: 0 0 var(--espaco-2); }
+.historico-registro p { margin: var(--espaco-1) 0; white-space: pre-wrap; }
+@media (max-width: 620px) {
+  .aulas-topo { align-items: stretch; flex-direction: column; }
+  .aulas-topo h2 { margin: 0; }
+  .aulas-lista li { align-items: stretch; flex-direction: column; }
+}

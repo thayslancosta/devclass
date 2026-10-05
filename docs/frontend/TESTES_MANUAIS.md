@@ -101,9 +101,27 @@ Vite). Nenhum valor de credencial listado aqui.
 
 ## Fase 4 — Pedro Henrique (aulas, registros, mensagem diária)
 
-_(preencher ao concluir a fase)_
+## Fase 4 – Pedro (aulas, registros e mensagem diária)
 
----
+**Versão:** branch `frontend-fase-4-pedro`, criada a partir de `origin/main` (37dec51).
+**Ambiente:** Node <cole o resultado do node -v>; backend na porta 3000 com MongoDB local temporário; frontend com `npm run dev` (Vite, porta 5173).
+
+**Fluxos executados**
+- Criar aula com tópicos e sem tópicos: passou.
+- Aula com data repetida: mensagem de conflito, lista consistente: passou.
+- Editar, arquivar e restaurar aula; filtros ativas/arquivadas/todas: passou.
+- Registro com várias habilidades e desempenhos independentes: passou.
+- Rascunho de um aluno preservado ao salvar outro: passou.
+- Registro vazio recusado; "Outra habilidade" exige descrição: passou.
+- Arquivar e restaurar registro: passou.
+- Abrir aula pela URL após recarregar (F5): passou.
+- Histórico no perfil do aluno com a data da aula: <passou/pendente>.
+- Mensagem diária: <descreva: gerada, editada, salva e copiada / apenas aviso de IA não configurada>.
+- Viewport estreito (~390 px) sem rolagem horizontal: <passou/pendente>.
+- `npm run lint` e `npm run build` em `frontend/`: passaram.
+
+**Pendências**
+- <Ex.: geração real de IA não testada por falta de OPENAI_API_KEY no ambiente de teste.>
 
 ## Fase 5 — Thayslan Costa (feedbacks e integração final)
 
