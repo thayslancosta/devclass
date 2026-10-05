@@ -1,0 +1,27 @@
+.pagina-admin__topo { margin-bottom: var(--espaco-4); }
+.pagina-admin__topo h1 { margin-bottom: var(--espaco-1); }
+.admin-filtros { display: flex; gap: var(--espaco-3); }
+.admin-filtros .campo { min-width: 190px; }
+.admin-tabela-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--cor-borda); border-radius: 10px; }
+.admin-tabela { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+.admin-tabela th,
+.admin-tabela td { padding: 12px 14px; border-bottom: 1px solid var(--cor-borda); vertical-align: middle; }
+.admin-tabela th { color: var(--cor-texto-secundario); font-size: 12px; font-weight: 600; background: var(--cor-sidebar); }
+.admin-tabela tbody tr:last-child td { border-bottom: 0; }
+.admin-tabela__acao { text-align: right; }
+.admin-sucesso { margin: 0 0 var(--espaco-3); padding: var(--espaco-2) var(--espaco-3); border-radius: var(--raio-borda); color: var(--cor-sucesso); background: #f1faf3; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+@media (max-width: 680px) {
+  .admin-filtros { display: grid; grid-template-columns: 1fr 1fr; gap: var(--espaco-2); }
+  .admin-filtros .campo { min-width: 0; }
+  .admin-tabela-wrap { overflow: visible; border: 0; }
+  .admin-tabela,
+  .admin-tabela tbody { display: block; width: 100%; }
+  .admin-tabela thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); }
+  .admin-tabela tr { display: block; margin-bottom: var(--espaco-3); border: 1px solid var(--cor-borda); border-radius: 10px; overflow: hidden; }
+  .admin-tabela td { display: flex; justify-content: space-between; gap: var(--espaco-2); text-align: right; }
+  .admin-tabela td::before { content: attr(data-label); color: var(--cor-texto-secundario); font-weight: 600; text-align: left; }
+  .admin-tabela .admin-tabela__acao { justify-content: flex-end; }
+  .admin-tabela .admin-tabela__acao::before { content: ''; }
+}

@@ -1,6 +1,6 @@
 # DevClass
 
-O DevClass é o backend de um diário de evolução pedagógica para professores de uma escola de línguas. Ele organiza turmas, alunos, matrículas, aulas e registros e permite preparar mensagens e feedbacks a partir das evidências registradas pelo professor.
+O DevClass é uma aplicação web para apoiar o diário de evolução pedagógica de professores de uma escola de línguas. O repositório contém o backend e o frontend React em `frontend/`.
 
 ## Funcionalidades
 
@@ -74,6 +74,27 @@ Durante o desenvolvimento também pode ser usado:
 
 ```bash
 npm run dev
+```
+
+## Frontend
+
+Com o backend iniciado na raiz do repositório, abra outro terminal:
+
+```bash
+cd frontend
+npm ci
+npm run dev
+```
+
+O Vite inicia em `http://localhost:5173` e encaminha `/auth`, `/admin` e `/graphql` para `http://localhost:3000`. Para apontar o proxy para outro endereço durante o desenvolvimento, configure `DEV_API_TARGET` no arquivo local `frontend/.env`; esse arquivo não deve ser versionado.
+
+O frontend usa Apollo Client 4 com RxJS. Na Fase 2, o professor pode consultar e administrar turmas por semestre, e a conta admin pode listar e ativar ou inativar usuários. A tela da turma já oferece navegação por Alunos, Aulas e Feedbacks para as fases seguintes.
+
+Para verificar o frontend:
+
+```bash
+npm run lint
+npm run build
 ```
 
 ## Regras principais
@@ -404,7 +425,6 @@ Resultado principal: HTTP 200 e feedback arquivado ainda presente em `data.feedb
 
 ## Limitações
 
-- O projeto não possui frontend.
 - O servidor depende de uma conexão configurada com MongoDB.
 - As gerações dependem de uma chave e de um modelo OpenAI configurados no servidor.
 - Os textos gerados precisam de revisão do professor.
