@@ -36,6 +36,12 @@ const alunoTypeDefs = gql`
   extend type Query {
     aluno(id: ID!): Aluno
     alunosDaTurma(turmaId: ID!, status: String): [Aluno!]!
+    """
+    Lista todos os cadastros de aluno do professor autenticado,
+    independente de matrícula em qualquer turma. status aceita
+    'ativo', 'inativo' ou 'todos'; ausente ou nulo usa 'ativo'.
+    """
+    meusAlunos(status: String): [Aluno!]!
   }
 
   extend type Mutation {

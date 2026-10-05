@@ -7,6 +7,7 @@ const Turma = require('../../models/Turma');
 
 const GENEROS = ['masculino', 'feminino', 'neutro'];
 const FILTROS_MATRICULA = ['ativa', 'encerrada', 'todas'];
+const FILTROS_CADASTRO = ['ativo', 'inativo', 'todos'];
 
 // Erros seguem os códigos canônicos da especificação (seção 11.8).
 // Nenhuma mensagem devolve stacktrace nem detalhe interno do MongoDB.
@@ -79,6 +80,21 @@ function validarCoerenciaResponsavel(dados) {
   if (dados.generoResponsavel !== undefined) {
     validarGenero(dados.generoResponsavel, 'do responsável');
   }
+}
+
+// Valida o filtro de status de CADASTRO (usado em meusAlunos).
+// Diferente de FILTROS_MATRICULA, que filtra a situação da matrícula.
+function validarStatusCadastro(status) {
+  const filtro = status === undefined || status === null ? 'ativo' : status;
+
+  if (!FILTROS_CADASTRO.includes(filtro)) {
+    throw erro(
+      "Status de cadastro inválido. Use 'ativo', 'inativo' ou 'todos'.",
+      'BAD_USER_INPUT'
+    );
+  }
+
+  return filtro;
 }
 
 // Carrega o aluno garantindo que ele pertence ao professor autenticado.
@@ -170,6 +186,22 @@ const alunoResolvers = {
         _id: { $in: matriculas.map((matricula) => matricula.alunoId) },
         professorId: usuario.id,
       }).sort({ nome: 1 });
+    },
+
+    // Lista independente de turma: todos os cadastros do professor,
+    // usada pela tela "Meus alunos" do frontend (Fase 1).
+    meusAlunos: async (_parent, { status }, context) => {
+      const usuario = exigirUsuario(context);
+
+      const filtroStatus = validarStatusCadastro(status);
+
+      const filtro = { professorId: usuario.id };
+
+      if (filtroStatus !== 'todos') {
+        filtro.status = filtroStatus;
+      }
+
+      return Aluno.find(filtro).sort({ nome: 1 });
     },
   },
 
