@@ -11,8 +11,8 @@ const CAMPOS_AULA = gql`
 `;
 
 export const AULAS = gql`
-  query Aulas($turmaId: ID!, $status: String) {
-    aulas(turmaId: $turmaId, status: $status) {
+  query Aulas($turmaId: ID!, $status: String, $dataInicio: String, $dataFim: String) {
+    aulas(turmaId: $turmaId, status: $status, dataInicio: $dataInicio, dataFim: $dataFim) {
       ...CamposAula
     }
   }

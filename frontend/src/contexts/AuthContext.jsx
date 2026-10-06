@@ -60,9 +60,6 @@ export function AuthProvider({ children }) {
 
       setStatus('autenticado');
     } catch (erro) {
-      // TEMPORÁRIO: log de diagnóstico, remover depois de identificar a causa.
-      console.error('[diagnostico restaurarSessao]', erro);
-
       const semAutenticacao = (erro.errors || erro.graphQLErrors)?.some(
         (e) => e.extensions?.code === 'UNAUTHENTICATED'
       );

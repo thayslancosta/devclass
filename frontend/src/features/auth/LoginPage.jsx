@@ -22,8 +22,16 @@ export default function LoginPage() {
 
     try {
       const usuario = await entrar({ email, senha });
-      const destino = local.state?.de || (usuario.perfil === 'admin' ? '/admin/usuarios' : '/turmas');
-      navigate(destino, { replace: true });
+      const destinoPadrao = usuario.perfil === 'admin' ? '/admin/usuarios' : '/turmas';
+      const destinoSolicitado = local.state?.de;
+      const destinoPermitido = usuario.perfil === 'admin'
+        ? destinoSolicitado?.startsWith('/admin')
+        : destinoSolicitado && !destinoSolicitado.startsWith('/admin');
+
+      navigate(
+        destinoPermitido ? destinoSolicitado : destinoPadrao,
+        { replace: true },
+      );
     } catch (e) {
       setErro(e);
     } finally {

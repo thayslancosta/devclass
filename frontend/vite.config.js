@@ -12,7 +12,11 @@ export default defineConfig(({ mode }) => {
       strictPort: true,
       proxy: {
         '/auth': { target, changeOrigin: true },
-        '/admin': { target, changeOrigin: true },
+        '/api/admin': {
+          target,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api\/admin/, '/admin'),
+        },
         '/graphql': { target, changeOrigin: true },
       },
     },

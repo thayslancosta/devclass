@@ -86,7 +86,7 @@ npm ci
 npm run dev
 ```
 
-O Vite inicia em `http://localhost:5173` e encaminha `/auth`, `/admin` e `/graphql` para `http://localhost:3000`. Para apontar o proxy para outro endereço durante o desenvolvimento, configure `DEV_API_TARGET` no arquivo local `frontend/.env`; esse arquivo não deve ser versionado.
+O Vite inicia em `http://localhost:5173` e encaminha `/auth`, `/api/admin` e `/graphql` para `http://localhost:3000`. O prefixo `/api/admin` é reescrito para `/admin` no backend, preservando a rota visual `/admin/usuarios` do React ao recarregar a página. Para apontar o proxy para outro endereço durante o desenvolvimento, configure `DEV_API_TARGET` no arquivo local `frontend/.env`; esse arquivo não deve ser versionado.
 
 O frontend usa Apollo Client 4 com RxJS. Na Fase 2, o professor pode consultar e administrar turmas por semestre, e a conta admin pode listar e ativar ou inativar usuários. A tela da turma já oferece navegação por Alunos, Aulas e Feedbacks para as fases seguintes.
 

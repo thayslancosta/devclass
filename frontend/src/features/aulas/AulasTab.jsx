@@ -53,8 +53,16 @@ export default function AulasTab() {
   const { turmaId } = useParams();
   const [status, setStatus] = useState('ativa');
   const [form, setForm] = useState(null);
+  const [dataInicio, setDataInicio] = useState('');
+  const [dataFim, setDataFim] = useState('');
   const [erroAcao, setErroAcao] = useState('');
-  const { data, loading, error, refetch } = useQuery(AULAS, { variables: { turmaId, status } });
+  const variaveis = {
+    turmaId,
+    status,
+    ...(dataInicio ? { dataInicio } : {}),
+    ...(dataFim ? { dataFim } : {}),
+  };
+  const { data, loading, error, refetch } = useQuery(AULAS, { variables: variaveis });
   const [arquivar] = useMutation(ARQUIVAR_AULA);
   const [restaurar] = useMutation(RESTAURAR_AULA);
 
@@ -80,6 +88,23 @@ export default function AulasTab() {
           <option value="arquivada">Arquivadas</option>
           <option value="todas">Todas</option>
         </Field>
+        <Field
+          id="aulas-data-inicio"
+          label="De"
+          type="date"
+          value={dataInicio}
+          onChange={(evento) => setDataInicio(evento.target.value)}
+        />
+        <Field
+          id="aulas-data-fim"
+          label="Até"
+          type="date"
+          value={dataFim}
+          onChange={(evento) => setDataFim(evento.target.value)}
+        />
+        <Button variant="secundario" onClick={() => { setDataInicio(''); setDataFim(''); }} disabled={!dataInicio && !dataFim}>
+          Limpar período
+        </Button>
         {turma.status === 'ativa' && <Button onClick={() => setForm('nova')}>Nova aula</Button>}
       </header>
 

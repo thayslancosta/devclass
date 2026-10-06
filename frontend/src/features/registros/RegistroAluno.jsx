@@ -160,6 +160,7 @@ export default function RegistroAluno({ aula, aluno, matricula, onDirty }) {
                 {!ativo && <p>Não há registro ativo nesta aula.</p>}
               </div>
               : <FormRegistro key={ativo?.id || `novo-${matricula.id}-${aula.id}`} aula={aula} matricula={matricula} registro={ativo} onDirty={onDirty} onSaved={refetch} />}
+            {ativo && !bloqueado && <MensagemDiaria registro={ativo} onChanged={refetch} />}
             {ativo && <Button variant="perigo" onClick={() => mudarSituacao(ativo, true)}>Arquivar registro</Button>}
             {arquivados.map((registro) => (
               <div key={registro.id} className="aulas-aviso">

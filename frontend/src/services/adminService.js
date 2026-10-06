@@ -1,4 +1,6 @@
-const BASE_URL = import.meta.env.VITE_REST_BASE_URL || '';
+const REST_BASE_URL = import.meta.env.VITE_REST_BASE_URL || '';
+const ADMIN_BASE_URL = import.meta.env.VITE_ADMIN_REST_BASE_URL
+  || (REST_BASE_URL ? `${REST_BASE_URL}/admin` : '/api/admin');
 
 async function tratarResposta(resposta) {
   let corpo = null;
@@ -37,7 +39,7 @@ export async function listarUsuarios({ token, perfil, ativo } = {}) {
 
   const query = params.toString() ? `?${params.toString()}` : '';
 
-  const resposta = await fetch(`${BASE_URL}/admin/usuarios${query}`, {
+  const resposta = await fetch(`${ADMIN_BASE_URL}/usuarios${query}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
@@ -46,7 +48,7 @@ export async function listarUsuarios({ token, perfil, ativo } = {}) {
 }
 
 export async function alterarStatusUsuario({ token, id, ativo }) {
-  const resposta = await fetch(`${BASE_URL}/admin/usuarios/${id}/status`, {
+  const resposta = await fetch(`${ADMIN_BASE_URL}/usuarios/${id}/status`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',

@@ -97,7 +97,7 @@ Vite). Nenhum valor de credencial listado aqui.
 - Passagem para a Fase 4: criar, na conta de demonstração do grupo, uma turma ativa com ao menos dois alunos matriculados. As matrículas do percurso da apresentação não devem ser encerradas, porque não podem ser refeitas no mesmo semestre.
 - As seções de registros e feedbacks do perfil são provisórias até as Fases 4 e 5 (`PerfilHistorico.jsx`).
 - Criar turma em um semestre que ainda não tem turmas pode depender de abrir `/turmas?periodo=AAAA.S` pela URL, pois o seletor de semestre lista apenas o atual e os já cadastrados. Tela da Fase 2, não alterada.
-- Abrir ou recarregar `/admin/usuarios` diretamente no navegador pode devolver a resposta JSON do backend, porque o proxy do Vite encaminha caminhos iniciados em `/admin`. Configuração da Fase 1, não alterada.
+- A rota visual `/admin/usuarios` deve recarregar como tela React; as chamadas REST admin usam o proxy `/api/admin`.
 
 ## Fase 4 — Pedro Henrique (aulas, registros, mensagem diária)
 
@@ -115,13 +115,14 @@ Vite). Nenhum valor de credencial listado aqui.
 - Registro vazio recusado; "Outra habilidade" exige descrição: passou.
 - Arquivar e restaurar registro: passou.
 - Abrir aula pela URL após recarregar (F5): passou.
-- Histórico no perfil do aluno com a data da aula: <passou/pendente>.
-- Mensagem diária: <descreva: gerada, editada, salva e copiada / apenas aviso de IA não configurada>.
-- Viewport estreito (~390 px) sem rolagem horizontal: <passou/pendente>.
+- Histórico no perfil do aluno com a data da aula: pendente de confirmação manual no ambiente da apresentação.
+- Mensagem diária: componente ajustado para aparecer no registro ativo salvo; geração real depende de `OPENAI_API_KEY` e deve ser confirmada no ambiente da apresentação.
+- Viewport estreito (~390 px) sem rolagem horizontal: pendente de confirmação manual no ambiente da apresentação.
 - `npm run lint` e `npm run build` em `frontend/`: passaram.
 
 **Pendências**
-- <Ex.: geração real de IA não testada por falta de OPENAI_API_KEY no ambiente de teste.>
+- Repetir o fluxo de mensagem diária com registro ativo salvo: gerar, editar, salvar e copiar, ou registrar `IA_NOT_CONFIGURED` caso o ambiente não tenha chave configurada.
+- Confirmar histórico no perfil e viewport estreito no ambiente da apresentação.
 
 ## Fase 5 — Thayslan Costa (feedbacks e integração final)
 
