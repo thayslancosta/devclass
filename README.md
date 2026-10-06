@@ -88,7 +88,7 @@ npm run dev
 
 O Vite inicia em `http://localhost:5173` e encaminha `/auth`, `/api/admin` e `/graphql` para `http://localhost:3000`. O prefixo `/api/admin` é reescrito para `/admin` no backend, preservando a rota visual `/admin/usuarios` do React ao recarregar a página. Para apontar o proxy para outro endereço durante o desenvolvimento, configure `DEV_API_TARGET` no arquivo local `frontend/.env`; esse arquivo não deve ser versionado.
 
-O frontend usa Apollo Client 4 com RxJS. Na Fase 2, o professor pode consultar e administrar turmas por semestre, e a conta admin pode listar e ativar ou inativar usuários. A tela da turma já oferece navegação por Alunos, Aulas e Feedbacks para as fases seguintes.
+O frontend usa Apollo Client 4 com RxJS. O professor pode administrar turmas por semestre e navegar pelas abas Alunos, Aulas e Feedbacks. A conta admin pode listar e ativar ou inativar usuários.
 
 Para verificar o frontend:
 
@@ -111,12 +111,24 @@ npm run build
 - **Matricular** seleciona um cadastro ativo que ainda não tem matrícula no semestre da turma. Quem não encontrar o aluno pode cadastrá-lo ali mesmo e voltar à seleção.
 - **Encerrar matrícula** é definitivo: o backend não oferece restauração nem transferência, e o aluno não pode ser matriculado de novo no mesmo semestre.
 
-Pontos de integração para as fases seguintes:
+Pontos de integração:
 
 - `frontend/src/features/alunos/useAlunosDaTurma.js`: `useAlunosDaTurma(turmaId, status)` devolve `itens` com `{ aluno, matricula }`, já pareando cada aluno com a matrícula daquela turma.
-- `frontend/src/features/alunos/PerfilHistorico.jsx`: recebe `{ aluno, matricula }` da matrícula selecionada no perfil. As seções de registros (Fase 4) e feedbacks (Fase 5) entram nesse arquivo, sem alterar `AlunoPerfilPage.jsx`.
+- `frontend/src/features/alunos/PerfilHistorico.jsx`: recebe `{ aluno, matricula }` da matrícula selecionada no perfil e integra registros (Fase 4) e feedbacks (Fase 5).
 - A matrícula selecionada no perfil fica na URL (`/alunos/:alunoId?matricula=<id>`). Sem o parâmetro, o perfil seleciona a matrícula do semestre em uso ou, se não houver, a mais recente.
 - `matricula.id` é o identificador usado em `registros(matriculaId)`, `feedbacks(matriculaId)` e `encerrarMatricula(id)`; o ID do aluno não serve para essas operações.
+
+### Feedbacks e integração final (Fase 5)
+
+A aba `/turmas/:turmaId/feedbacks` reúne as matrículas da turma, inclusive encerradas e de alunos inativos. O perfil `/alunos/:alunoId?matricula=<id>` mostra os feedbacks da matrícula histórica selecionada. Os filtros distinguem tipo, envio e arquivamento.
+
+- Crie feedback parcial/final manualmente ou solicite a IA explicitamente. A seleção gera uma matrícula por chamada, em sequência, com resultado individual. Uma falha de conteúdo permite seguir; falhas de sessão, serviço ou consulta interrompem as próximas chamadas. Não há retentativa automática, nem repetição dos concluídos ao gerar os selecionados pendentes.
+- Revise, salve e copie; o original da IA fica expansível. Regenerar exige confirmação antes de substituir textos existentes e rascunhos locais. Atualizar consultas preserva as revisões locais.
+- Depois de enviar por conta própria, confirme “Marcar como enviado”. Copiar ou salvar não marca envio; alterações locais precisam ser salvas primeiro. Desmarque o envio para editar ou regenerar. Arquivados precisam ser restaurados, respeitando o limite de um ativo por matrícula/tipo.
+
+Percurso de apresentação: login → semestre/turma → alunos e matrículas → aula e registros → mensagem diária → feedbacks parcial/final → revisão, cópia e confirmação de envio → histórico no perfil → logout. Em outra sessão, a conta admin demonstra a lista e a situação dos usuários.
+
+Verificação adicional, dentro de `frontend/`: `node --test tests/feedbacks.test.cjs` valida os documentos GraphQL, a sequência e os bloqueios do editor sem banco nem IA. A execução no navegador e os testes com persistência/IA real estão **pendentes**, conforme [testes manuais](docs/frontend/TESTES_MANUAIS.md).
 
 ## Regras principais
 

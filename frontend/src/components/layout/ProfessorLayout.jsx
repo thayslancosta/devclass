@@ -7,6 +7,7 @@ export default function ProfessorLayout() {
   const navigate = useNavigate();
 
   async function aoSair() {
+    if (!window.dispatchEvent(new Event('devclass:antes-sair', { cancelable: true }))) return;
     await sair();
     navigate('/login', { replace: true });
   }

@@ -10,6 +10,9 @@ import { ALUNO } from '../../graphql/alunos';
 import AlunoForm from './AlunoForm';
 import ErroDeConsulta from './ErroDeConsulta';
 import PerfilHistorico from './PerfilHistorico';
+import FeedbacksArea from '../feedbacks/FeedbacksArea';
+import Abas from '../../components/common/Abas';
+import { contextoPerfil } from './perfilContexto';
 import SituacaoAlunoDialog from './SituacaoAlunoDialog';
 import { mensagemDeErro, rotuloCadastro, rotuloGenero, rotuloMatricula } from './alunosUtils';
 import './alunos.css';
@@ -53,14 +56,14 @@ export default function AlunoPerfilPage() {
     );
   }
 
-  // O backend devolve o histórico do semestre mais recente para o mais antigo.
   const matriculas = aluno.matriculas;
-  const matriculaDaUrl = searchParams.get('matricula');
-  const matriculaSelecionada =
-    matriculas.find((matricula) => matricula.id === matriculaDaUrl)
-    || matriculas.find((matricula) => matricula.periodoLetivo === periodoSelecionado)
-    || matriculas[0]
-    || null;
+  const { selecionada: matriculaSelecionada, aba, historicoImplicito } = contextoPerfil(matriculas, searchParams, periodoSelecionado);
+  const matriculaAtual = matriculas.find((m) => m.periodoLetivo === periodoSelecionado);
+  function selecionarAba(valor) {
+    const proxima = new URLSearchParams(searchParams);
+    proxima.set('aba', valor);
+    setSearchParams(proxima, { replace: true });
+  }
   const temResponsavel = Boolean(
     aluno.nomeResponsavel || aluno.generoResponsavel || aluno.contatoResponsavel,
   );
@@ -68,6 +71,7 @@ export default function AlunoPerfilPage() {
   function selecionarMatricula(id) {
     const proxima = new URLSearchParams(searchParams);
     proxima.set('matricula', id);
+    proxima.delete('feedback');
     setSearchParams(proxima, { replace: true });
   }
 
@@ -77,6 +81,7 @@ export default function AlunoPerfilPage() {
       <header className="pagina-aluno__topo">
         <div>
           <p className="alunos-sobretitulo">Perfil do aluno</p>
+          {aluno.nomeResponsavel && <p className="alunos-secundario">Responsável: {aluno.nomeResponsavel}</p>}
           <div className="alunos-item__titulo">
             <h1>{aluno.nome}</h1>
             <span className={'situacao-pill alunos-pill--' + aluno.status}>
@@ -84,6 +89,35 @@ export default function AlunoPerfilPage() {
             </span>
           </div>
         </div>
+      </header>
+      {matriculaSelecionada && <p className="perfil-contexto">
+        <Link to={`/turmas/${matriculaSelecionada.turmaId}/alunos`}>{matriculaSelecionada.turma?.nome || 'Turma'}</Link>
+        {' · Semestre '}{matriculaSelecionada.periodoLetivo}{' · '}{rotuloMatricula(matriculaSelecionada.status)}
+      </p>}
+      {historicoImplicito && <p className="alunos-aviso">Sem matrícula em {periodoSelecionado}. Você está consultando o histórico de {matriculaSelecionada.periodoLetivo}.</p>}
+      {matriculas.length > 0 && !matriculaSelecionada && <p role="alert">A matrícula do link não está disponível. Escolha um semestre abaixo.</p>}
+      {matriculas.length > 0 && <details className="perfil-secao">
+        <summary>Ver semestres anteriores</summary>
+        <div className="perfil-matriculas" role="group" aria-label="Escolher matrícula">
+          {matriculas.map((m) => <button className={'perfil-matricula' + (m.id === matriculaSelecionada?.id ? ' selecionada' : '')}
+            key={m.id} type="button" aria-pressed={m.id === matriculaSelecionada?.id} onClick={() => selecionarMatricula(m.id)}>
+            {m.turma?.nome || 'Turma'} · {m.periodoLetivo} · {rotuloMatricula(m.status)}
+          </button>)}
+        </div>
+      </details>}
+      {matriculaAtual && matriculaAtual.id !== matriculaSelecionada?.id && <Button variant="secundario" onClick={() => selecionarMatricula(matriculaAtual.id)}>Voltar ao semestre {matriculaAtual.periodoLetivo}</Button>}
+      {!matriculas.length && <EmptyState titulo="Sem matrícula" descricao="Abra uma turma ativa e use Matricular aluno. O cadastro continua disponível na aba Dados."
+        acao={<Link to="/turmas">Ir para Turmas</Link>} />}
+      <Abas id="perfil-aba" label="Conteúdo do aluno" atual={aba} onChange={selecionarAba}
+        itens={[['registros', 'Registros'], ['feedbacks', 'Feedbacks'], ['dados', 'Dados']]} />
+      <div id="perfil-aba-painel" role="tabpanel" aria-labelledby={`perfil-aba-${aba}`}>
+
+      {sucesso && <p className="alunos-sucesso" role="status">{sucesso}</p>}
+      {erroAcao && <ErrorMessage texto={mensagemDeErro(erroAcao)} />}
+      {error && <ErroDeConsulta erro={error} onTentarNovamente={() => refetch()} />}
+
+      {aba === 'dados' && <section className="perfil-secao" aria-labelledby="perfil-cadastro-titulo">
+        <h2 id="perfil-cadastro-titulo">Dados do aluno</h2>
         <div className="pagina-aluno__acoes">
           <Button variant="secundario" onClick={() => { setSucesso(''); setEditando(true); }}>
             Editar cadastro
@@ -95,14 +129,7 @@ export default function AlunoPerfilPage() {
             {aluno.status === 'ativo' ? 'Inativar cadastro' : 'Reativar cadastro'}
           </Button>
         </div>
-      </header>
 
-      {sucesso && <p className="alunos-sucesso" role="status">{sucesso}</p>}
-      {erroAcao && <ErrorMessage texto={mensagemDeErro(erroAcao)} />}
-      {error && <ErroDeConsulta erro={error} onTentarNovamente={() => refetch()} />}
-
-      <section className="perfil-secao" aria-labelledby="perfil-cadastro-titulo">
-        <h2 id="perfil-cadastro-titulo">Cadastro</h2>
         <dl className="perfil-dados">
           <div>
             <dt>Gênero gramatical</dt>
@@ -140,68 +167,12 @@ export default function AlunoPerfilPage() {
             matrículas e o histórico abaixo continuam preservados.
           </p>
         )}
-      </section>
+      </section>}
 
-      <section className="perfil-secao" aria-labelledby="perfil-matriculas-titulo">
-        <h2 id="perfil-matriculas-titulo">Matrículas</h2>
-        {matriculas.length === 0 ? (
-          <EmptyState
-            titulo="Nenhuma matrícula"
-            descricao='Para matricular este aluno, abra uma turma ativa e use "Matricular aluno" na aba Alunos.'
-            acao={<Link className="botao botao--secundario" to="/turmas">Ir para Turmas</Link>}
-          />
-        ) : (
-          <>
-            <p className="alunos-secundario">
-              Selecione uma matrícula para ver o histórico daquele semestre. A situação da matrícula
-              (ativa ou encerrada) é independente da situação do cadastro.
-            </p>
-            <div className="perfil-matriculas" role="group" aria-label="Matrículas do aluno">
-              {matriculas.map((matricula) => {
-                const selecionada = matricula.id === matriculaSelecionada.id;
-                return (
-                  <button
-                    key={matricula.id}
-                    type="button"
-                    className={'perfil-matricula' + (selecionada ? ' selecionada' : '')}
-                    aria-pressed={selecionada}
-                    onClick={() => selecionarMatricula(matricula.id)}
-                  >
-                    <span className="perfil-matricula__periodo">Semestre {matricula.periodoLetivo}</span>
-                    <span className="perfil-matricula__turma">
-                      {matricula.turma?.nome || 'Turma indisponível'}
-                    </span>
-                    <span className={'situacao-pill alunos-pill--' + matricula.status}>
-                      {rotuloMatricula(matricula.status)}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </>
-        )}
-      </section>
-
-      {matriculaSelecionada && (
-        <section className="perfil-secao" aria-labelledby="perfil-historico-titulo">
-          <h2 id="perfil-historico-titulo">Histórico do semestre {matriculaSelecionada.periodoLetivo}</h2>
-          <p className="alunos-secundario">
-            {matriculaSelecionada.turma ? (
-              <Link to={'/turmas/' + matriculaSelecionada.turmaId + '/alunos'}>
-                {matriculaSelecionada.turma.nome}
-              </Link>
-            ) : (
-              'Turma indisponível'
-            )}
-            {' · '}{rotuloMatricula(matriculaSelecionada.status)}
-          </p>
-          <PerfilHistorico
-            key={matriculaSelecionada.id}
-            aluno={aluno}
-            matricula={matriculaSelecionada}
-          />
-        </section>
-      )}
+      {aba === 'registros' && matriculaSelecionada && <PerfilHistorico key={matriculaSelecionada.id} aluno={aluno} matricula={matriculaSelecionada} />}
+      {aba === 'feedbacks' && matriculaSelecionada && <FeedbacksArea key={matriculaSelecionada.id} itens={[{ aluno, matricula: matriculaSelecionada }]} />}
+      {aba !== 'dados' && !matriculaSelecionada && <p>Selecione uma matrícula para consultar {aba}.</p>}
+      </div>
 
       {editando && (
         <AlunoForm

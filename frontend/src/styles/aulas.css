@@ -30,4 +30,25 @@
   .aulas-topo { align-items: stretch; flex-direction: column; }
   .aulas-topo h2 { margin: 0; }
   .aulas-lista li { align-items: stretch; flex-direction: column; }
+}.aulas-topo { flex-wrap: wrap; }
+.aula-edicao h2 { margin-top: 20px; }
+.aula-metadados { max-width: 640px; }
+.aula-edicao summary { padding: 12px 0; cursor: pointer; }
+.registro-edicao { padding: 16px; background: var(--cor-fundo); }
+.registro-edicao .registro-cab { padding: 0 0 12px; }
+.registro-edicao h3 { margin: 0; font-size: 17px; }
+.campos-registro { display: grid; gap: 8px; }
+.campos-registro input, .campos-registro select, .campos-registro textarea { width: 100%; min-width: 0; min-height: 42px; padding: 10px; border: 1px solid var(--cor-borda); border-radius: var(--raio-borda); color: var(--cor-texto); background: var(--cor-fundo); }
+.campos-registro textarea { resize: vertical; line-height: 1.5; }
+.campos-registro .avaliacao { margin: 12px 0; }
+.registro-secundario { margin: 12px 0; }
+.aula-salvar { margin: 24px 0 16px; }
+.aulas :focus-visible { outline: 2px solid var(--cor-acao); outline-offset: 2px; }
+.aulas p { overflow-wrap: anywhere; }
+.aulas .botao { min-height: 44px; white-space: normal; }
+.aulas-historico { margin-top: 20px; }
+@media (max-width: 520px) {
+  .aula-salvar { align-items: stretch; flex-direction: column; }
+  .registro-edicao .registro-cab { align-items: start; flex-direction: column; }
+  .registro-edicao { padding: 12px; }
 }

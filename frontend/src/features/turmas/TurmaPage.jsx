@@ -103,7 +103,3 @@ export default function TurmaPage() {
     </section>
   );
 }
-
-export function TurmaTabPlaceholder({ titulo, descricao }) {
-  return <EmptyState titulo={titulo} descricao={descricao} />;
-}

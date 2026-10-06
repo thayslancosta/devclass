@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useMutation } from '@apollo/client/react';
 import Button from '../../components/common/Button';
 import ErrorMessage from '../../components/common/ErrorMessage';
 import { EDITAR_MENSAGEM, GERAR_MENSAGEM } from '../../graphql/registros';
 import { fmtTimestamp, infoErro } from '../../utils/datas';
 
-export default function MensagemDiaria({ registro, onChanged, somenteLeitura = false }) {
+export default function MensagemDiaria({ registro, onChanged, onPending, somenteLeitura = false, bloqueado = false }) {
   const inicial = registro.mensagemEditada ?? registro.mensagemIAOriginal ?? '';
   const [texto, setTexto] = useState(inicial);
   const [original, setOriginal] = useState(registro.mensagemIAOriginal || '');
@@ -16,6 +16,11 @@ export default function MensagemDiaria({ registro, onChanged, somenteLeitura = f
   const [gerar, geracao] = useMutation(GERAR_MENSAGEM);
   const [editar, edicao] = useMutation(EDITAR_MENSAGEM);
   const sujo = texto !== salvo;
+  const trava = useRef(false);
+  const campo = useRef(null);
+  const busy = geracao.loading || edicao.loading;
+  useEffect(() => { onPending?.(registro.id, sujo, busy); }, [onPending, registro.id, sujo, busy]);
+  useEffect(() => () => { onPending?.(registro.id, false, false); }, [onPending, registro.id]);
 
   function aplicarRegistro(atualizado) {
     const mensagem = atualizado.mensagemEditada ?? atualizado.mensagemIAOriginal ?? '';
@@ -26,14 +31,15 @@ export default function MensagemDiaria({ registro, onChanged, somenteLeitura = f
   }
 
   async function gerarMensagem() {
-    if (geracao.loading) return;
+    if (trava.current || bloqueado || somenteLeitura) return;
     if (texto && !window.confirm('Regenerar substituirá também o texto editado. Continuar?')) return;
+    trava.current = true;
     setErro('');
     setInfo('');
     try {
       const resultado = await gerar({ variables: { id: registro.id } });
       aplicarRegistro(resultado.data.gerarMensagemDiaria);
-      await onChanged();
+      await onChanged?.(resultado.data.gerarMensagemDiaria);
     } catch (falha) {
       const { code, msg } = infoErro(falha);
       const mensagem = code === 'IA_NOT_CONFIGURED'
@@ -42,21 +48,22 @@ export default function MensagemDiaria({ registro, onChanged, somenteLeitura = f
           ? 'A IA está indisponível. Tente novamente mais tarde.'
           : msg;
       setErro(mensagem);
-    }
+    } finally { trava.current = false; }
   }
 
   async function salvarMensagem() {
-    if (edicao.loading || !sujo) return;
+    if (trava.current || bloqueado || somenteLeitura || !sujo) return;
+    trava.current = true;
     setErro('');
     setInfo('');
     try {
       const resultado = await editar({ variables: { id: registro.id, texto } });
       aplicarRegistro(resultado.data.editarMensagemDiaria);
       setInfo('Mensagem salva.');
-      await onChanged();
+      await onChanged?.(resultado.data.editarMensagemDiaria);
     } catch (falha) {
       setErro(infoErro(falha).msg);
-    }
+    } finally { trava.current = false; }
   }
 
   async function copiarMensagem() {
@@ -64,7 +71,8 @@ export default function MensagemDiaria({ registro, onChanged, somenteLeitura = f
       await navigator.clipboard.writeText(texto);
       setInfo(sujo ? 'Copiado; há alterações ainda não salvas.' : 'Copiado.');
     } catch {
-      setInfo('Não foi possível copiar automaticamente. Selecione o texto para copiar.');
+      campo.current?.focus(); campo.current?.select();
+      setInfo('Texto selecionado. Use Ctrl+C ou ⌘C, ou o menu Copiar.');
     }
   }
 
@@ -72,7 +80,7 @@ export default function MensagemDiaria({ registro, onChanged, somenteLeitura = f
     <section className="mensagem-diaria" aria-label="Mensagem diária">
       <h4>Mensagem diária</h4>
       {!somenteLeitura && (
-        <Button onClick={gerarMensagem} busy={geracao.loading}>
+        <Button onClick={gerarMensagem} busy={geracao.loading} disabled={bloqueado || busy}>
           {texto ? 'Regenerar mensagem' : 'Gerar mensagem'}
         </Button>
       )}
@@ -80,11 +88,11 @@ export default function MensagemDiaria({ registro, onChanged, somenteLeitura = f
         <>
           {geradaEm && <small>Gerada em {fmtTimestamp(geradaEm)}</small>}
           <label htmlFor={`mensagem-${registro.id}`}>{somenteLeitura ? 'Mensagem diária' : 'Texto editável'}
-            <textarea id={`mensagem-${registro.id}`} rows={6} value={texto} readOnly={somenteLeitura} onChange={(evento) => { setTexto(evento.target.value); setInfo(''); }} />
+            <textarea ref={campo} id={`mensagem-${registro.id}`} rows={6} value={texto} readOnly={somenteLeitura || bloqueado || busy} onChange={(evento) => { setTexto(evento.target.value); setInfo(''); }} />
           </label>
           <div className="aulas-acoes">
-            {!somenteLeitura && <Button onClick={salvarMensagem} busy={edicao.loading} disabled={!sujo || !texto.trim()}>Salvar revisão</Button>}
-            {!somenteLeitura && <Button variant="secundario" onClick={copiarMensagem}>Copiar</Button>}
+            {!somenteLeitura && <Button onClick={salvarMensagem} busy={edicao.loading} disabled={bloqueado || busy || !sujo || !texto.trim()}>Salvar revisão</Button>}
+            <Button variant="secundario" onClick={copiarMensagem}>Copiar</Button>
           </div>
           {original && <details><summary>Texto original da IA</summary><p>{original}</p></details>}
         </>
