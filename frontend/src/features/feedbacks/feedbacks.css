@@ -1,0 +1,26 @@
+.feedbacks-area { min-width: 0; }
+.feedback-filtros { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 20px 0; }
+.feedback-acoes { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.feedback-lote, .feedback-aluno { padding: 16px; border: 1px solid var(--cor-borda); border-radius: var(--raio-borda); margin: 16px 0; background: var(--cor-fundo); }
+.feedback-item { border-top: 1px solid var(--cor-borda); padding: 16px 0; margin-top: 16px; }
+.feedback-item h4 { margin: 0 0 8px; }
+.feedback-meta { color: var(--cor-texto-secundario); font-size: 13px; }
+.feedback-selecao { display: flex; align-items: center; gap: 8px; min-height: 44px; }
+.feedback-editor { margin-top: 16px; }
+.feedback-editor textarea, .feedbacks-area textarea { display: block; width: 100%; min-height: 140px; resize: vertical; padding: 12px; border: 1px solid var(--cor-borda); border-radius: var(--raio-borda); line-height: 1.6; color: var(--cor-texto); background: var(--cor-fundo); }
+.feedback-editor label { display: block; margin-bottom: 8px; }
+.feedback-original { white-space: pre-wrap; overflow-wrap: anywhere; }
+.feedbacks-area p, .feedbacks-area h3, .feedbacks-area h4 { overflow-wrap: anywhere; }
+.feedbacks-area summary { cursor: pointer; padding: 12px 0; }
+.feedbacks-area :focus-visible { outline: 2px solid var(--cor-acao); outline-offset: 2px; }
+.feedbacks-area progress { width: 100%; }
+.feedbacks-area .botao { min-height: 44px; white-space: normal; }
+@media (max-width: 520px) {
+  .feedback-filtros { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .feedback-acoes { flex-direction: column; }
+  .feedback-acoes .botao { width: 100%; }
+  .feedback-aluno, .feedback-lote { padding: 12px; }
+}
+.feedback-cabecalho { display: flex; align-items: start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.feedback-historicos { margin-top: 20px; padding-top: 12px; border-top: 1px solid var(--cor-borda); }
+.feedback-sobre { margin-top: 24px; color: var(--cor-texto-secundario); }
