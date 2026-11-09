@@ -132,7 +132,7 @@ A aba `/turmas/:turmaId/feedbacks` reúne as matrículas da turma, inclusive enc
 
 Percurso de apresentação: login → semestre/turma → alunos e matrículas → aula e registros → mensagem diária → feedbacks parcial/final → revisão, cópia e confirmação de envio → histórico no perfil → logout. Em outra sessão, a conta admin demonstra a lista e a situação dos usuários.
 
-Verificação adicional, dentro de `frontend/`: `node --test tests/feedbacks.test.cjs` valida os documentos GraphQL, a sequência e os bloqueios do editor sem banco nem IA. A execução no navegador e os testes com persistência/IA real estão **pendentes**, conforme [testes manuais](docs/frontend/TESTES_MANUAIS.md).
+Verificação adicional, dentro de `frontend/`: `node --test tests/feedbacks.test.cjs` valida os documentos GraphQL, a sequência e os bloqueios do editor sem banco nem IA. A execução no navegador e os testes com persistência/IA real estão **pendentes** e devem ser validados manualmente em um ambiente local configurado.
 
 ## Regras principais
 
