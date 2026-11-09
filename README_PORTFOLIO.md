@@ -80,8 +80,8 @@ OpenAI key is optional for startup; generation requests report
 | POST | `/graphql` | Classes, students, enrolments, lessons, records and feedbacks |
 
 The admin routes require a Bearer token with the `admin` role. Detailed GraphQL
-examples and presentation material remain in `MDs/`, `docs/` and the Postman
-collections already present in the repository.
+examples are available in the main README, while the Postman collections at the
+repository root document HTTP requests.
 
 ## Contributions and team context
 
@@ -104,5 +104,5 @@ The project is suitable for local demonstration with MongoDB and fictional data.
 Browser-level verification, persistence tests against a real MongoDB, and AI calls
 remain environment-dependent. No deployment or public demo is claimed.
 
-DevClass originated in the `lubrias/devclass-backend` team repository. Any future
-portfolio branch must retain that provenance and the collaborators' credits.
+DevClass originated in the collaborative `lubrias/devclass-backend` team repository.
+This public repository preserves that provenance and the collaborators' commits.
