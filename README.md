@@ -1,5 +1,9 @@
 # DevClass
 
+> Collaborative full-stack academic journal for language schools. This README
+> preserves the detailed project record below; the concise recruiter-facing
+> overview is available in [README_PORTFOLIO.md](README_PORTFOLIO.md).
+
 O DevClass é uma aplicação web para apoiar o diário de evolução pedagógica de professores de uma escola de línguas. O repositório contém o backend e o frontend React em `frontend/`.
 
 ## Funcionalidades
